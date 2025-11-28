@@ -7,13 +7,38 @@ import jsPDF from 'jspdf';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import LoadingSkeleton from '../components/LoadingSkeleton';
+import apiService from '../services/api';
+import { useApiAuth } from '../hooks/useApiAuth';
 
 const Dashboard = () => {
   const [message, setMessage] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState(() => {
+    // Load history from localStorage on component mount
+    try {
+      const savedHistory = localStorage.getItem('spamshield-history');
+      return savedHistory ? JSON.parse(savedHistory) : [];
+    } catch (error) {
+      console.error('Failed to load history from localStorage:', error);
+      return [];
+    }
+  });
   const [showHistory, setShowHistory] = useState(false);
+
+  // Initialize API authentication
+  useApiAuth();
+
+  // Save history to localStorage
+  const saveHistory = (newHistory) => {
+    try {
+      localStorage.setItem('spamshield-history', JSON.stringify(newHistory));
+      setHistory(newHistory);
+    } catch (error) {
+      console.error('Failed to save history to localStorage:', error);
+      setHistory(newHistory); // Still update state even if localStorage fails
+    }
+  };
 
   const exampleMessages = [
     'URGENT: Your bank account has been suspended. Click here to verify: bit.ly/verify123',
@@ -25,13 +50,91 @@ const Dashboard = () => {
   const onDrop = (acceptedFiles) => {
     const file = acceptedFiles[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target.result;
-        setMessage(text);
-        toast.success(`File "${file.name}" loaded successfully!`);
-      };
-      reader.readAsText(file);
+      // Show options: Load content or Analyze directly
+      toast((t) => (
+        <div className="flex flex-col gap-2">
+          <div className="font-medium">File "{file.name}" uploaded</div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                loadFileContent(file);
+                toast.dismiss(t.id);
+              }}
+              className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+            >
+              Load Content
+            </button>
+            <button
+              onClick={() => {
+                analyzeFileDirectly(file);
+                toast.dismiss(t.id);
+              }}
+              className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+            >
+              Analyze Directly
+            </button>
+          </div>
+        </div>
+      ), {
+        duration: 10000,
+      });
+    }
+  };
+
+  // Load file content into text area
+  const loadFileContent = (file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target.result;
+      setMessage(text);
+      toast.success(`File "${file.name}" content loaded successfully!`);
+    };
+    reader.readAsText(file);
+  };
+
+  // Analyze file directly via backend
+  const analyzeFileDirectly = async (file) => {
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const response = await apiService.analyzeFile(file);
+      
+      if (response.success) {
+        const analysisData = response.data.analysis;
+        
+        // Transform backend response to match frontend format
+        const analysisResult = {
+          isSpam: analysisData.classification === 'spam',
+          confidence: Math.round(analysisData.confidence * 100),
+          reasons: [
+            ...analysisData.analysis_details.keyword_matches.map(k => `Contains spam keyword: "${k}"`),
+            ...analysisData.analysis_details.pattern_matches.map(p => `Suspicious pattern: ${p}`),
+            ...analysisData.analysis_details.url_matches.map(u => `Suspicious URL: ${u.domain}`),
+            ...analysisData.analysis_details.formatting_issues.map(f => `Formatting issue: ${f}`),
+            ...(analysisData.threats_detected.length > 0 ? [`Threat detected: ${analysisData.threats_detected.join(', ')}`] : [])
+          ],
+          threatType: analysisData.threats_detected.join(', ') || 'None',
+          riskScore: analysisData.risk_score,
+          classification: analysisData.classification,
+          recommendations: analysisData.recommendations,
+          timestamp: new Date(analysisData.analyzed_at).toLocaleString(),
+          message: `File: ${file.name}`,
+          fileName: file.name
+        };
+
+        setResult(analysisResult);
+        const newHistory = [analysisResult, ...history].slice(0, 10);
+        saveHistory(newHistory);
+        toast.success(`File "${file.name}" analyzed successfully!`);
+      } else {
+        toast.error(response.error || 'File analysis failed');
+      }
+    } catch (error) {
+      console.error('File analysis error:', error);
+      toast.error('Failed to analyze file. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -72,49 +175,54 @@ const Dashboard = () => {
   };
 
   const analyzeMessage = async () => {
-    if (!message.trim()) return;
+    if (!message.trim()) {
+      toast.error('Please enter a message to analyze');
+      return;
+    }
 
     setLoading(true);
     setResult(null);
 
-    // Simulate API call
-    setTimeout(() => {
-      // Simple spam detection logic for demo
-      const spamKeywords = ['urgent', 'click here', 'congratulations', 'won', 'claim', 'verify', 'suspended', 'prize'];
-      const hasSpamKeywords = spamKeywords.some(keyword => 
-        message.toLowerCase().includes(keyword)
-      );
-      const hasLinks = /https?:\/\/|bit\.ly|www\./i.test(message);
-      const hasAllCaps = /[A-Z]{3,}/.test(message);
-      const hasMoneySigns = /\$|€|£|\d+,\d+/.test(message);
+    try {
+      // Call real backend API
+      const response = await apiService.analyzeMessage(message);
+      
+      if (response.success) {
+        const analysisData = response.data.analysis; // Backend puts analysis in 'analysis' field
+        
+        // Transform backend response to match frontend format
+        const analysisResult = {
+          isSpam: analysisData.classification === 'spam',
+          confidence: Math.round(analysisData.confidence * 100), // Convert 0.9 to 90
+          reasons: [
+            ...analysisData.analysis_details.keyword_matches.map(k => `Contains spam keyword: "${k}"`),
+            ...analysisData.analysis_details.pattern_matches.map(p => `Suspicious pattern: ${p}`),
+            ...analysisData.analysis_details.url_matches.map(u => `Suspicious URL: ${u.domain}`),
+            ...analysisData.analysis_details.formatting_issues.map(f => `Formatting issue: ${f}`),
+            ...(analysisData.threats_detected.length > 0 ? [`Threat detected: ${analysisData.threats_detected.join(', ')}`] : [])
+          ],
+          threatType: analysisData.threats_detected.join(', ') || 'None',
+          riskScore: analysisData.risk_score,
+          classification: analysisData.classification,
+          recommendations: analysisData.recommendations,
+          timestamp: new Date(analysisData.analyzed_at).toLocaleString(),
+          message: message.substring(0, 100) + (message.length > 100 ? '...' : ''),
+        };
 
-      const spamScore = 
-        (hasSpamKeywords ? 30 : 0) +
-        (hasLinks ? 25 : 0) +
-        (hasAllCaps ? 20 : 0) +
-        (hasMoneySigns ? 25 : 0);
-
-      const isSpam = spamScore > 40;
-      const confidence = Math.min(spamScore + Math.random() * 20, 99);
-
-      const analysisResult = {
-        isSpam,
-        confidence: confidence.toFixed(1),
-        reasons: [
-          hasSpamKeywords && 'Contains spam keywords',
-          hasLinks && 'Contains suspicious links',
-          hasAllCaps && 'Excessive use of capital letters',
-          hasMoneySigns && 'Contains monetary references',
-        ].filter(Boolean),
-        timestamp: new Date().toLocaleString(),
-        message: message.substring(0, 100) + '...',
-      };
-
-      setResult(analysisResult);
-      setHistory([analysisResult, ...history].slice(0, 10)); // Keep last 10
+        setResult(analysisResult);
+        const newHistory = [analysisResult, ...history].slice(0, 10); // Keep last 10
+        saveHistory(newHistory);
+        toast.success('Analysis complete!');
+      } else {
+        // Handle API errors
+        toast.error(response.error || 'Analysis failed');
+      }
+    } catch (error) {
+      console.error('Analysis error:', error);
+      toast.error('Failed to analyze message. Please try again.');
+    } finally {
       setLoading(false);
-      toast.success('Analysis complete!');
-    }, 1500);
+    }
   };
 
   return (
@@ -291,9 +399,22 @@ const Dashboard = () => {
                   <h2 className="text-2xl font-bold text-gray-800">
                     {result.isSpam ? 'Spam Detected!' : 'Message Looks Safe'}
                   </h2>
-                  <p className="text-gray-600">
-                    Confidence: <span className="font-semibold">{result.confidence}%</span>
-                  </p>
+                  <div className="space-y-1">
+                    <p className="text-gray-600">
+                      Confidence: <span className="font-semibold">{result.confidence}%</span>
+                    </p>
+                    <p className="text-gray-600">
+                      Risk Score: <span className="font-semibold">{result.riskScore}/100</span>
+                    </p>
+                    <p className="text-gray-600">
+                      Classification: <span className="font-semibold capitalize">{result.classification}</span>
+                    </p>
+                    {result.threatType && result.threatType !== 'None' && (
+                      <p className="text-red-600">
+                        Threats: <span className="font-semibold">{result.threatType}</span>
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -311,12 +432,17 @@ const Dashboard = () => {
                 </div>
               )}
 
-              {result.isSpam && (
-                <div className="mt-6 p-4 bg-yellow-100 border border-yellow-300 rounded-lg">
-                  <p className="text-sm text-gray-800">
-                    <strong>⚠️ Warning:</strong> Do not click any links or provide personal information.
-                    Report this message to your service provider.
-                  </p>
+              {result.recommendations && result.recommendations.length > 0 && (
+                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <h3 className="font-semibold text-gray-800 mb-3">🛡️ Security Recommendations:</h3>
+                  <ul className="space-y-2">
+                    {result.recommendations.map((rec, index) => (
+                      <li key={index} className="flex items-start space-x-2">
+                        <span className="text-blue-500 mt-1">•</span>
+                        <span className="text-gray-700 text-sm">{rec}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </motion.div>

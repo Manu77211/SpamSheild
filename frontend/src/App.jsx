@@ -9,6 +9,8 @@ import About from './pages/About';
 import Chatbot from './components/Chatbot';
 import ToastProvider from './components/ToastProvider';
 import ProtectedRoute from './components/ProtectedRoute';
+import BackendTest from './components/BackendTest';
+import SpamTestSuite from './components/SpamTestSuite';
 
 function App() {
   return (
@@ -29,6 +31,12 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/about" element={<About />} />
+          <Route path="/test" element={<BackendTest />} />
+          <Route path="/test-suite" element={
+            <ProtectedRoute>
+              <SpamTestSuite />
+            </ProtectedRoute>
+          } />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
         </Routes>
