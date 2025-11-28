@@ -27,7 +27,10 @@ class Database:
             
         except Exception as e:
             logger.error(f"Failed to connect to MongoDB: {e}")
-            raise
+            # Don't raise the error - let the app start without DB
+            logger.warning("App starting without MongoDB connection")
+            self._client = None
+            self._db = None
     
     @property
     def client(self):
