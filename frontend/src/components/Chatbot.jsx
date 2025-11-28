@@ -1,51 +1,118 @@
-import { useState } from 'react';
-import { MessageCircle, X, Send, Bot } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import toast from 'react-hot-toast';
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hi! I'm SpamShield AI Assistant. How can I help you today?",
+      text: "Hi! I'm SpamShield AI Assistant. I can help you with spam detection, security questions, and guide you through our features. How can I assist you today?",
       sender: 'bot',
+      timestamp: new Date()
     },
   ]);
   const [inputValue, setInputValue] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
+
+  // Initialize Google AI
+  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_AI_API_KEY);
+  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
   const quickActions = [
-    'Check a message',
-    'Report spam',
-    'How does it work?',
-    'Get help',
+    'How to check if a message is spam?',
+    'What makes a message suspicious?',
+    'How does SpamShield work?',
+    'Tips to avoid spam messages'
   ];
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
+  // Auto-scroll to bottom
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
-    // Add user message
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Focus input when chat opens
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [isOpen]);
+
+  const handleSend = async () => {
+    if (!inputValue.trim() || isTyping) return;
+
     const userMessage = {
-      id: messages.length + 1,
-      text: inputValue,
+      id: Date.now(),
+      text: inputValue.trim(),
       sender: 'user',
+      timestamp: new Date()
     };
-    setMessages([...messages, userMessage]);
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botMessage = {
-        id: messages.length + 2,
-        text: 'Thanks for your message! Our AI is analyzing your request. For immediate spam checking, please use the Dashboard.',
-        sender: 'bot',
-      };
-      setMessages((prev) => [...prev, botMessage]);
-    }, 1000);
-
+    setMessages(prev => [...prev, userMessage]);
     setInputValue('');
+    setIsTyping(true);
+
+    try {
+      // Create context-aware prompt
+      const contextPrompt = `You are SpamShield AI Assistant, a helpful chatbot for a spam detection application. 
+      
+User question: ${userMessage.text}
+      
+Provide a helpful, concise response related to spam detection, cybersecurity, or using SpamShield features. Keep responses under 150 words and be friendly and informative. If the question is not related to spam/security, politely redirect to spam-related topics.`;
+
+      const result = await model.generateContent(contextPrompt);
+      const response = await result.response;
+      const botText = response.text();
+
+      const botMessage = {
+        id: Date.now() + 1,
+        text: botText,
+        sender: 'bot',
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('AI Error:', error);
+      const errorMessage = {
+        id: Date.now() + 1,
+        text: "I'm having trouble connecting right now. Please try again in a moment, or use our Dashboard to analyze messages directly!",
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      toast.error('Failed to get AI response');
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleQuickAction = (action) => {
     setInputValue(action);
+    inputRef.current?.focus();
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const formatTime = (timestamp) => {
+    return new Date(timestamp).toLocaleTimeString('en-US', {
+      hour12: true,
+      hour: 'numeric',
+      minute: '2-digit'
+    });
   };
 
   return (

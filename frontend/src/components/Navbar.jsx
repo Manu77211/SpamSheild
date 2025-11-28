@@ -81,8 +81,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                >
+                  className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition">
                   Sign Up
                 </Link>
               </>
@@ -169,7 +168,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/signup"
-                  className="block px-4 py-2 bg-blue-600 text-white rounded-lg text-center"
+                  className="block px-4 py-2 text-blue-600 border border-blue-600 rounded-lg text-center"
                   onClick={() => setIsOpen(false)}
                 >
                   Sign Up
