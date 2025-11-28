@@ -5,50 +5,50 @@ const Features = () => {
   const features = [
     {
       icon: Brain,
-      title: 'AI-Powered Detection',
-      description: 'Advanced machine learning algorithms analyze patterns to identify spam and phishing attempts with incredible accuracy.',
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100',
+      title: 'Smart Detection',
+      description: 'Simple technology to help identify spam messages and keep your inbox organized.',
+      color: 'text-purple-400',
+      bgColor: 'bg-purple-500/20',
     },
     {
       icon: Zap,
-      title: 'Real-Time Protection',
-      description: 'Instant analysis and blocking of suspicious messages before they reach your inbox.',
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-100',
+      title: 'Quick Analysis',
+      description: 'Get instant results when you check your messages for spam content.',
+      color: 'text-blue-400',
+      bgColor: 'bg-blue-500/20',
     },
     {
       icon: Shield,
-      title: 'Multi-Layer Security',
-      description: 'Comprehensive protection against phishing, malware, and social engineering attacks.',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
+      title: 'Easy Protection',
+      description: 'Simple tools to help you stay safe from suspicious messages and content.',
+      color: 'text-indigo-400',
+      bgColor: 'bg-indigo-500/20',
     },
     {
       icon: Lock,
-      title: 'Privacy First',
-      description: 'Your messages are analyzed securely without storing personal data. Complete privacy guaranteed.',
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
+      title: 'Privacy Focused',
+      description: 'Your messages stay private. We don\'t store or save any of your personal information.',
+      color: 'text-green-400',
+      bgColor: 'bg-green-500/20',
     },
     {
       icon: Globe,
-      title: 'Global Threat Database',
-      description: 'Connected to worldwide threat intelligence for up-to-date protection against emerging scams.',
-      color: 'text-indigo-600',
-      bgColor: 'bg-indigo-100',
+      title: 'Always Updated',
+      description: 'Our system stays current with the latest spam patterns to help protect you better.',
+      color: 'text-cyan-400',
+      bgColor: 'bg-cyan-500/20',
     },
     {
       icon: TrendingUp,
-      title: 'Continuous Learning',
-      description: 'Our AI constantly evolves and improves by learning from new spam patterns and threats.',
-      color: 'text-pink-600',
-      bgColor: 'bg-pink-100',
+      title: 'Getting Better',
+      description: 'Our detection improves over time by learning from new spam examples.',
+      color: 'text-rose-400',
+      bgColor: 'bg-rose-500/20',
     },
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-linear-to-b from-gray-900 via-gray-800 to-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -59,8 +59,8 @@ const Features = () => {
             transition={{ duration: 0.6 }}
             className="text-4xl md:text-5xl font-bold mb-4"
           >
-            <span className="bg-gradient-to-r-from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Powerful Features
+            <span className="bg-linear-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
+              Why Choose SpamShield
             </span>
           </motion.h2>
           <motion.p
@@ -68,9 +68,9 @@ const Features = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-xl text-gray-600 max-w-2xl mx-auto"
+            className="text-xl text-gray-300 max-w-2xl mx-auto"
           >
-            Everything you need to stay protected from spam and phishing attacks
+            Simple tools to help you identify and manage spam messages effectively
           </motion.p>
         </div>
 
@@ -83,20 +83,20 @@ const Features = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              whileHover={{ y: -10, scale: 1.05, rotateY: 5 }}
-              className="group p-6 rounded-2xl bg-linear-to-br from-white to-gray-50 shadow-lg hover:shadow-2xl transition cursor-pointer"
+              whileHover={{ y: -10, scale: 1.05 }}
+              className="group p-8 rounded-2xl bg-gray-800/60 backdrop-blur-xl border border-purple-500/20 shadow-2xl hover:shadow-purple-500/20 transition cursor-pointer"
             >
               <motion.div 
-                className={`inline-flex p-3 rounded-xl ${feature.bgColor} mb-4`}
+                className={`inline-flex p-4 rounded-xl ${feature.bgColor} backdrop-blur-sm mb-6`}
                 whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.1 }}
                 transition={{ duration: 0.5 }}
               >
-                <feature.icon className={`h-6 w-6 ${feature.color}`} />
+                <feature.icon className={`h-7 w-7 ${feature.color}`} />
               </motion.div>
-              <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition">
+              <h3 className="text-xl font-bold text-white mb-4 group-hover:bg-linear-to-r group-hover:from-purple-400 group-hover:to-cyan-400 group-hover:bg-clip-text group-hover:text-transparent transition">
                 {feature.title}
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-300 leading-relaxed">
                 {feature.description}
               </p>
             </motion.div>

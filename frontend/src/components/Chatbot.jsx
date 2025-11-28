@@ -166,7 +166,7 @@ const Chatbot = forwardRef((props, ref) => {
       {/* Chat Window */}
       {isOpen && (
         <div 
-          className="fixed bottom-6 right-6 w-80 sm:w-96 min-h-[400px] max-h-[80vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300 z-50"
+          className="fixed bottom-6 right-6 w-80 sm:w-96 min-h-[400px] max-h-[80vh] bg-gray-900/95 backdrop-blur-xl border border-purple-500/30 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300 z-50"
           style={{
             position: 'fixed',
             bottom: '24px',
@@ -213,7 +213,7 @@ const Chatbot = forwardRef((props, ref) => {
                   className={`max-w-[85%] rounded-2xl px-4 py-3 wrap-break-word ${
                     msg.sender === "user"
                       ? "bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-br-md"
-                      : "bg-white text-gray-800 rounded-bl-md shadow-sm border border-gray-200"
+                      : "bg-gray-800/60 text-white rounded-bl-md shadow-sm border border-purple-500/20"
                   }`}
                 >
                   <div className="flex items-start space-x-2">
@@ -255,7 +255,7 @@ const Chatbot = forwardRef((props, ref) => {
             {/* Typing Indicator */}
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-white rounded-2xl rounded-bl-md px-4 py-2 shadow-sm border border-gray-200">
+                <div className="bg-gray-800/60 rounded-2xl rounded-bl-md px-4 py-2 shadow-sm border border-purple-500/20">
                   <div className="flex items-center space-x-2">
                     <Bot className="w-4 h-4 text-blue-600" />
                     <div className="flex space-x-1">
@@ -271,14 +271,14 @@ const Chatbot = forwardRef((props, ref) => {
           </div>
 
           {/* Input */}
-          <div className="p-4 border-t bg-white">
+          <div className="p-4 border-t border-purple-500/20 bg-gray-800/60">
             <div className="flex space-x-2">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="flex-1 border border-gray-300 bg-white text-gray-800 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm placeholder-gray-500"
+                className="flex-1 border border-purple-500/30 bg-gray-700/50 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 text-sm placeholder-gray-400"
                 placeholder="Ask about spam detection, security..."
               />
               <button

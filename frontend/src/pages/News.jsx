@@ -75,11 +75,11 @@ const News = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-gray-900">
       <Navbar />
       
       {/* Hero Section */}
-      <div className="bg-gradient-to-r-from-blue-600 to-purple-600 text-white pt-24 pb-16">
+      <div className="bg-linear-to-br from-indigo-900/50 via-gray-800 to-gray-900 text-white pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -87,11 +87,13 @@ const News = () => {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-black">
-              Latest Spam & Security News
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              <span className="bg-linear-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                Security News
+              </span>
             </h1>
-            <p className="text-xl text-black max-w-2xl mx-auto">
-              Stay informed about the latest threats, scams, and security updates
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              Stay updated on the latest security threats and protection tips
             </p>
           </motion.div>
         </div>
@@ -109,7 +111,7 @@ const News = () => {
                 placeholder="Search news..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-3 bg-gray-700/60 backdrop-blur-sm border border-purple-500/30 text-white placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400"
               />
             </div>
 
@@ -119,10 +121,10 @@ const News = () => {
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-lg font-medium transition ${
+                  className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${
                     selectedCategory === category
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                      ? 'bg-linear-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/25'
+                      : 'bg-gray-700/60 backdrop-blur-sm border border-purple-500/30 text-gray-300 hover:bg-purple-500/20 hover:text-white hover:border-purple-400/50'
                   }`}
                 >
                   {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -135,8 +137,8 @@ const News = () => {
         {/* Featured/Trending Section */}
         <div className="mb-12">
           <div className="flex items-center space-x-2 mb-6">
-            <TrendingUp className="h-6 w-6 text-orange-500" />
-            <h2 className="text-2xl font-bold text-gray-800">Trending Now</h2>
+            <TrendingUp className="h-6 w-6 text-cyan-400" />
+            <h2 className="text-2xl font-bold text-white">Trending Now</h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredArticles
@@ -148,7 +150,7 @@ const News = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition cursor-pointer"
+                  className="bg-gray-800/60 backdrop-blur-xl border border-purple-500/20 rounded-2xl shadow-2xl shadow-purple-500/10 overflow-hidden hover:shadow-purple-500/20 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                 >
                   <div className="relative h-48">
                     <img
@@ -156,13 +158,13 @@ const News = () => {
                       alt={article.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-4 right-4 px-3 py-1 bg-orange-500 text-white text-sm font-semibold rounded-full">
+                    <div className="absolute top-4 right-4 px-3 py-1 bg-cyan-500 text-white text-sm font-semibold rounded-full">
                       Trending
                     </div>
                   </div>
                   <div className="p-6">
-                    <div className="flex items-center space-x-4 mb-3 text-sm text-gray-500">
-                      <span className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full font-medium">
+                    <div className="flex items-center space-x-4 mb-3 text-sm text-gray-400">
+                      <span className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full font-medium border border-purple-500/30">
                         {article.category}
                       </span>
                       <div className="flex items-center space-x-1">
@@ -170,10 +172,10 @@ const News = () => {
                         <span>{new Date(article.date).toLocaleDateString()}</span>
                       </div>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">
+                    <h3 className="text-xl font-bold text-white mb-2">
                       {article.title}
                     </h3>
-                    <p className="text-gray-600">{article.excerpt}</p>
+                    <p className="text-gray-300">{article.excerpt}</p>
                   </div>
                 </motion.div>
               ))}
@@ -182,7 +184,7 @@ const News = () => {
 
         {/* All Articles Grid */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">All Articles</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">All Articles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredArticles.map((article, index) => (
               <motion.div
@@ -191,7 +193,7 @@ const News = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.05 }}
-                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition cursor-pointer"
+                className="bg-gray-800/60 backdrop-blur-xl border border-purple-500/20 rounded-xl shadow-2xl shadow-purple-500/10 overflow-hidden hover:shadow-purple-500/20 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
               >
                 <div className="relative h-40">
                   <img

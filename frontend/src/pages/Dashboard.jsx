@@ -226,7 +226,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-gray-900">
       <Navbar />
       
       <div className="pt-24 pb-16">
@@ -238,14 +238,14 @@ const Dashboard = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <div className="inline-flex items-center justify-center p-3 bg-blue-100 rounded-full mb-4">
-              <Shield className="h-8 w-8 text-blue-600" />
+            <div className="inline-flex items-center justify-center p-4 bg-purple-500/20 backdrop-blur-sm rounded-full mb-6 border border-purple-500/30">
+              <Shield className="h-10 w-10 text-purple-400" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Spam Message Checker
+            <h1 className="text-4xl md:text-4xl font-bold mb-5 bg-linear-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
+              Message Scanner
             </h1>
-            <p className="text-xl text-gray-600">
-              Paste any message below and our AI will analyze it for spam and phishing threats
+            <p className="text-xl text-gray-300">
+              Paste any message below to check if it might be spam
             </p>
           </motion.div>
 
@@ -254,7 +254,7 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-xl p-8"
+            className="bg-gray-800/60 backdrop-blur-xl border border-purple-500/20 rounded-2xl shadow-2xl shadow-purple-500/10 p-8"
           >
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-2 mb-6">
@@ -262,7 +262,7 @@ const Dashboard = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowHistory(!showHistory)}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                className="flex items-center space-x-2 px-5 py-2.5 bg-gray-700/60 backdrop-blur-sm border border-purple-500/30 text-gray-300 rounded-xl hover:bg-purple-500/20 hover:text-white hover:border-purple-400/50 transition-all duration-300"
               >
                 <History className="h-4 w-4" />
                 <span>History</span>
@@ -274,7 +274,7 @@ const Dashboard = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={exportToPDF}
-                  className="flex items-center space-x-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition"
+                  className="flex items-center space-x-2 px-5 py-2.5 bg-green-500/20 border border-green-500/30 text-green-400 rounded-xl hover:bg-green-500/30 hover:text-green-300 hover:border-green-400/50 transition-all duration-300 backdrop-blur-sm"
                 >
                   <Download className="h-4 w-4" />
                   <span>Export PDF</span>
@@ -284,7 +284,7 @@ const Dashboard = () => {
 
             {/* Text Area */}
             <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-300 mb-3">
                 Message to Check
               </label>
               <textarea
@@ -292,7 +292,7 @@ const Dashboard = () => {
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Paste your message here..."
                 rows="6"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-4 py-3 bg-gray-700/60 backdrop-blur-sm border border-purple-500/30 text-white placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 resize-none transition-all duration-300"
               />
             </div>
 
@@ -300,36 +300,36 @@ const Dashboard = () => {
             <div className="mb-6">
               <div
                 {...getRootProps()}
-                className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition ${
+                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 ${
                   isDragActive
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
+                    ? 'border-purple-500 bg-purple-500/10'
+                    : 'border-purple-500/30 hover:border-purple-400 hover:bg-purple-500/5'
                 }`}
               >
                 <input {...getInputProps()} />
-                <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <Upload className="h-10 w-10 text-purple-400 mx-auto mb-3" />
                 {isDragActive ? (
-                  <p className="text-blue-600 font-medium">Drop the file here...</p>
+                  <p className="text-purple-400 font-medium">Drop the file here...</p>
                 ) : (
                   <div>
-                    <p className="text-gray-600 font-medium mb-1">Drag & drop a text file here</p>
-                    <p className="text-sm text-gray-500">or click to browse (.txt files only)</p>
+                    <p className="text-gray-300 font-medium mb-1">Drag & drop a text file here</p>
+                    <p className="text-sm text-gray-400">or click to browse (.txt files only)</p>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Example Messages */}
-            <div className="mb-6">
-              <p className="text-sm font-semibold text-gray-700 mb-3">Try example messages:</p>
-              <div className="flex flex-wrap gap-2">
+            <div className="mb-8">
+              <p className="text-sm font-semibold text-gray-300 mb-4">Try example messages:</p>
+              <div className="flex flex-wrap gap-3">
                 {exampleMessages.map((example, index) => (
                   <button
                     key={index}
                     onClick={() => setMessage(example)}
-                    className="text-sm px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex items-center space-x-1"
+                    className="text-sm px-4 py-2.5 bg-gray-700/60 backdrop-blur-sm border border-purple-500/30 text-gray-300 rounded-xl hover:bg-purple-500/20 hover:text-white hover:border-purple-400/50 transition-all duration-300 flex items-center space-x-2"
                   >
-                    <Copy className="h-3 w-3" />
+                    <Copy className="h-4 w-4" />
                     <span>Example {index + 1}</span>
                   </button>
                 ))}
@@ -342,7 +342,7 @@ const Dashboard = () => {
               disabled={!message.trim() || loading}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:shadow-2xl transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 relative overflow-hidden"
+              className="w-full py-4 bg-linear-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl hover:shadow-2xl hover:shadow-purple-500/25 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 relative overflow-hidden"
             >
               {!loading && !message.trim() && (
                 <motion.div
@@ -354,12 +354,12 @@ const Dashboard = () => {
               {loading ? (
                 <>
                   <Loader className="h-5 w-5 animate-spin" />
-                  <span>Analyzing...</span>
+                  <span>Checking...</span>
                 </>
               ) : (
                 <>
                   <Shield className="h-5 w-5" />
-                  <span>Analyze Message</span>
+                  <span>Check Message</span>
                 </>
               )}
             </motion.button>
@@ -371,47 +371,47 @@ const Dashboard = () => {
               initial={{ opacity: 0, scale: 0.5, y: 50 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 15 }}
-              className={`mt-8 rounded-2xl shadow-xl p-8 ${
+              className={`mt-8 rounded-2xl shadow-2xl p-8 backdrop-blur-xl border-2 ${
                 result.isSpam
-                  ? 'bg-linear-to-br from-red-50 to-orange-50 border-2 border-red-200'
-                  : 'bg-linear-to-br from-green-50 to-emerald-50 border-2 border-green-200'
+                  ? 'bg-red-900/30 border-red-500/30 shadow-red-500/10'
+                  : 'bg-green-900/30 border-green-500/30 shadow-green-500/10'
               }`}
             >
               <div className="flex items-center space-x-4 mb-6">
                 {result.isSpam ? (
                   <motion.div 
-                    className="p-3 bg-red-100 rounded-full"
+                    className="p-4 bg-red-500/20 backdrop-blur-sm rounded-full border border-red-500/30"
                     animate={{ scale: [1, 1.1, 1], rotate: [0, -5, 5, 0] }}
                     transition={{ duration: 0.5, repeat: 3 }}
                   >
-                    <AlertTriangle className="h-8 w-8 text-red-600" />
+                    <AlertTriangle className="h-10 w-10 text-red-400" />
                   </motion.div>
                 ) : (
                   <motion.div 
-                    className="p-3 bg-green-100 rounded-full"
+                    className="p-4 bg-green-500/20 backdrop-blur-sm rounded-full border border-green-500/30"
                     animate={{ scale: [1, 1.2, 1] }}
                     transition={{ duration: 0.5, repeat: 2 }}
                   >
-                    <CheckCircle className="h-8 w-8 text-green-600" />
+                    <CheckCircle className="h-10 w-10 text-green-400" />
                   </motion.div>
                 )}
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-800">
+                  <h2 className="text-2xl font-bold text-white">
                     {result.isSpam ? 'Spam Detected!' : 'Message Looks Safe'}
                   </h2>
-                  <div className="space-y-1">
-                    <p className="text-gray-600">
-                      Confidence: <span className="font-semibold">{result.confidence}%</span>
+                  <div className="space-y-2">
+                    <p className="text-gray-300">
+                      Confidence: <span className="font-semibold text-white">{result.confidence}%</span>
                     </p>
-                    <p className="text-gray-600">
-                      Risk Score: <span className="font-semibold">{result.riskScore}/100</span>
+                    <p className="text-gray-300">
+                      Risk Score: <span className="font-semibold text-white">{result.riskScore}/100</span>
                     </p>
-                    <p className="text-gray-600">
-                      Classification: <span className="font-semibold capitalize">{result.classification}</span>
+                    <p className="text-gray-300">
+                      Classification: <span className="font-semibold capitalize text-white">{result.classification}</span>
                     </p>
                     {result.threatType && result.threatType !== 'None' && (
-                      <p className="text-red-600">
-                        Threats: <span className="font-semibold">{result.threatType}</span>
+                      <p className="text-red-400">
+                        Threats: <span className="font-semibold text-red-300">{result.threatType}</span>
                       </p>
                     )}
                   </div>
@@ -419,13 +419,13 @@ const Dashboard = () => {
               </div>
 
               {result.reasons.length > 0 && (
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-3">Detection Reasons:</h3>
+                <div className="mt-6 p-4 bg-red-900/20 backdrop-blur-sm border border-red-500/30 rounded-xl">
+                  <h3 className="font-semibold text-white mb-3">Detection Reasons:</h3>
                   <ul className="space-y-2">
                     {result.reasons.map((reason, index) => (
                       <li key={index} className="flex items-start space-x-2">
-                        <span className="text-red-500 mt-1">•</span>
-                        <span className="text-gray-700">{reason}</span>
+                        <span className="text-red-400 mt-1">•</span>
+                        <span className="text-gray-200">{reason}</span>
                       </li>
                     ))}
                   </ul>
@@ -433,13 +433,13 @@ const Dashboard = () => {
               )}
 
               {result.recommendations && result.recommendations.length > 0 && (
-                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h3 className="font-semibold text-gray-800 mb-3">🛡️ Security Recommendations:</h3>
+                <div className="mt-6 p-4 bg-blue-900/20 backdrop-blur-sm border border-blue-500/30 rounded-xl">
+                  <h3 className="font-semibold text-white mb-3">🛡️ Security Recommendations:</h3>
                   <ul className="space-y-2">
                     {result.recommendations.map((rec, index) => (
                       <li key={index} className="flex items-start space-x-2">
-                        <span className="text-blue-500 mt-1">•</span>
-                        <span className="text-gray-700 text-sm">{rec}</span>
+                        <span className="text-blue-400 mt-1">•</span>
+                        <span className="text-gray-200 text-sm">{rec}</span>
                       </li>
                     ))}
                   </ul>
@@ -464,17 +464,17 @@ const Dashboard = () => {
                   animate={{ x: 0 }}
                   exit={{ x: '100%' }}
                   transition={{ type: 'spring', damping: 25 }}
-                  className="fixed right-0 top-0 h-full w-full md:w-96 bg-white shadow-2xl z-50 overflow-y-auto"
+                  className="fixed right-0 top-0 h-full w-full md:w-96 bg-gray-900/95 backdrop-blur-xl border-l border-purple-500/30 shadow-2xl z-50 overflow-y-auto"
                 >
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-bold text-gray-800 flex items-center space-x-2">
-                        <History className="h-6 w-6" />
+                      <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
+                        <History className="h-6 w-6 text-purple-400" />
                         <span>History</span>
                       </h2>
                       <button
                         onClick={() => setShowHistory(false)}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition"
+                        className="p-2 hover:bg-gray-700/50 rounded-lg transition text-white"
                       >
                         ✕
                       </button>
@@ -482,8 +482,8 @@ const Dashboard = () => {
 
                     {history.length === 0 ? (
                       <div className="text-center py-12">
-                        <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                        <p className="text-gray-500">No history yet</p>
+                        <FileText className="h-16 w-16 text-gray-500 mx-auto mb-4" />
+                        <p className="text-gray-300">No history yet</p>
                         <p className="text-sm text-gray-400 mt-2">
                           Your analyzed messages will appear here
                         </p>
@@ -497,10 +497,10 @@ const Dashboard = () => {
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.1 }}
                             whileHover={{ scale: 1.02 }}
-                            className={`p-4 rounded-lg cursor-pointer ${
+                            className={`p-4 rounded-lg cursor-pointer transition-all ${
                               item.isSpam
-                                ? 'bg-red-50 border border-red-200'
-                                : 'bg-green-50 border border-green-200'
+                                ? 'bg-red-500/10 border border-red-500/30 hover:bg-red-500/20'
+                                : 'bg-green-500/10 border border-green-500/30 hover:bg-green-500/20'
                             }`}
                             onClick={() => {
                               setMessage(item.message);
@@ -517,7 +517,7 @@ const Dashboard = () => {
                               </span>
                               <span className="text-xs text-gray-500">{item.timestamp}</span>
                             </div>
-                            <p className="text-sm text-gray-700 truncate mb-2">{item.message}</p>
+                            <p className="text-sm text-gray-300 truncate mb-2">{item.message}</p>
                             <div className="flex items-center justify-between">
                               <span className="text-xs text-gray-600">
                                 Confidence: {item.confidence}%

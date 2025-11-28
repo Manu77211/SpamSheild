@@ -7,39 +7,39 @@ const About = () => {
   const values = [
     {
       icon: Shield,
-      title: 'Security First',
-      description: 'Your privacy and data security are our top priorities in everything we build.',
+      title: 'Keep You Safe',
+      description: 'We focus on protecting your personal information and keeping your data private.',
     },
     {
       icon: Zap,
-      title: 'Innovation',
-      description: 'Constantly evolving our AI to stay ahead of emerging threats and scams.',
+      title: 'Simple Tools',
+      description: 'Easy-to-use spam detection that anyone can understand and use effectively.',
     },
     {
       icon: Heart,
-      title: 'User-Centric',
-      description: 'Designed with simplicity in mind, making protection accessible to everyone.',
+      title: 'Made for You',
+      description: 'Built with regular users in mind, no complicated setup or confusing features.',
     },
     {
       icon: Users,
-      title: 'Community',
-      description: 'Building a safer digital world together through collaboration and education.',
+      title: 'Better Together',
+      description: 'Helping everyone stay safer online by sharing knowledge and good practices.',
     },
   ];
 
   const stats = [
-    { number: '2020', label: 'Founded' },
-    { number: '50K+', label: 'Active Users' },
-    { number: '99.5%', label: 'Accuracy Rate' },
-    { number: '1M+', label: 'Threats Blocked' },
+    { number: '2025', label: 'Built This Year' },
+    { number: 'Free', label: 'Always Free' },
+    { number: 'Simple', label: 'Easy to Use' },
+    { number: 'Private', label: 'Your Data Stays Safe' },
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-gray-900">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-24 pb-16 bg-linear-to-br from-blue-600 to-purple-600">
+      <section className="pt-24 pb-16 bg-linear-to-br from-purple-900/50 via-gray-800 to-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -47,22 +47,24 @@ const About = () => {
             transition={{ duration: 0.6 }}
             className="text-center text-white"
           >
-            <div className="inline-flex items-center justify-center p-3 bg-white/20 rounded-full mb-6">
+            <div className="inline-flex items-center justify-center p-4 bg-purple-500/20 backdrop-blur-sm border border-purple-500/30 rounded-full mb-6">
               <Shield className="h-12 w-12" />
             </div>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Protecting the Digital World,<br />One Message at a Time
+              <span className="bg-linear-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                Helping You Stay Safe Online
+              </span>
             </h1>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-              We're on a mission to make the internet a safer place by empowering everyone
-              with intelligent spam and phishing detection technology.
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              SpamShield is a simple tool that helps you identify spam messages and stay protected
+              from online scams and suspicious content.
             </p>
           </motion.div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 bg-white">
+      <section className="py-16 bg-gray-800/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
@@ -72,12 +74,12 @@ const About = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="text-center"
+                className="text-center p-6 bg-gray-800/60 backdrop-blur-xl border border-purple-500/20 rounded-xl hover:scale-105 transition-transform duration-300"
               >
-                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r-from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                <div className="text-3xl md:text-4xl font-bold bg-linear-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent mb-2">
                   {stat.number}
                 </div>
-                <div className="text-gray-600 font-medium">{stat.label}</div>
+                <div className="text-gray-300 font-medium">{stat.label}</div>
               </motion.div>
             ))}
           </div>
@@ -85,7 +87,7 @@ const About = () => {
       </section>
 
       {/* Mission Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-900/70">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -94,22 +96,20 @@ const About = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <div className="inline-flex items-center space-x-2 text-blue-600 mb-4">
+              <div className="inline-flex items-center space-x-2 text-purple-400 mb-4">
                 <Target className="h-6 w-6" />
-                <span className="font-semibold">Our Mission</span>
+                <span className="font-semibold">What We Do</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
-                Making Cybersecurity Accessible to Everyone
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                Making Online Safety Simple
               </h2>
-              <p className="text-lg text-gray-600 mb-4 leading-relaxed">
-                In 2020, we witnessed countless people fall victim to increasingly sophisticated
-                phishing and spam attacks. We knew there had to be a better way.
+              <p className="text-lg text-gray-300 mb-4 leading-relaxed">
+                We created SpamShield because we believe everyone should be able to identify
+                spam messages easily, without needing technical knowledge.
               </p>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                SpamShield was born from a simple belief: everyone deserves protection from
-                digital threats, regardless of their technical expertise. Using cutting-edge
-                AI and machine learning, we've built a solution that's both powerful and
-                incredibly easy to use.
+              <p className="text-lg text-gray-300 leading-relaxed">
+                Our tool helps regular people stay safe online by providing simple,
+                clear results when checking suspicious messages.
               </p>
             </motion.div>
 
@@ -133,7 +133,7 @@ const About = () => {
       </section>
 
       {/* Values Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-800/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -143,12 +143,12 @@ const About = () => {
             className="text-center mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Our Core Values
+              <span className="bg-linear-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                Our Values
               </span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              The principles that guide everything we do
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              What we believe in and how we work
             </p>
           </motion.div>
 
@@ -160,13 +160,13 @@ const About = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="text-center p-6 rounded-2xl bg-linear-to-br from-gray-50 to-blue-50 hover:shadow-xl transition"
+                className="text-center p-6 rounded-2xl bg-gray-800/60 backdrop-blur-xl border border-purple-500/20 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 hover:scale-105"
               >
-                <div className="inline-flex p-4 bg-linear-to-br from-blue-600 to-purple-600 rounded-xl mb-4">
+                <div className="inline-flex p-4 bg-linear-to-br from-purple-600 to-blue-600 rounded-xl mb-4">
                   <value.icon className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3">{value.title}</h3>
-                <p className="text-gray-600">{value.description}</p>
+                <h3 className="text-xl font-bold text-white mb-3">{value.title}</h3>
+                <p className="text-gray-300">{value.description}</p>
               </motion.div>
             ))}
           </div>

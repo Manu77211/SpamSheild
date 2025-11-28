@@ -5,36 +5,36 @@ const HowItWorks = () => {
   const steps = [
     {
       icon: Upload,
-      title: 'Submit Message',
-      description: 'Paste or upload any suspicious message, email, or SMS you want to verify.',
-      color: 'from-blue-500 to-cyan-500',
+      title: 'Add Your Message',
+      description: 'Simply paste any message you want to check for spam content.',
+      color: 'from-purple-500 to-indigo-500',
       delay: 0.2,
     },
     {
       icon: Brain,
-      title: 'AI Analysis',
-      description: 'Our advanced AI scans patterns, keywords, links, and sender behavior in milliseconds.',
-      color: 'from-purple-500 to-pink-500',
+      title: 'Smart Check',
+      description: 'Our system quickly looks at the message patterns and content.',
+      color: 'from-blue-500 to-purple-500',
       delay: 0.4,
     },
     {
       icon: Shield,
-      title: 'Threat Detection',
-      description: 'Machine learning identifies phishing attempts, scams, and malicious content.',
-      color: 'from-orange-500 to-red-500',
+      title: 'Find Issues',
+      description: 'The system identifies any suspicious patterns or content.',
+      color: 'from-indigo-500 to-purple-500',
       delay: 0.6,
     },
     {
       icon: CheckCircle,
-      title: 'Get Results',
-      description: 'Receive instant verdict with detailed explanation and safety recommendations.',
-      color: 'from-green-500 to-emerald-500',
+      title: 'See Results',
+      description: 'Get clear results showing if the message is safe or spam.',
+      color: 'from-purple-500 to-cyan-500',
       delay: 0.8,
     },
   ];
 
   return (
-    <section className="py-20 bg-linear-to-br from-gray-50 to-blue-50">
+    <section className="py-20 bg-linear-to-br from-gray-800 via-gray-900 to-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -45,19 +45,19 @@ const HowItWorks = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
               How It Works
             </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Simple, fast, and accurate spam detection in just 4 steps
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Quick and easy spam detection in just 4 simple steps
           </p>
         </motion.div>
 
         {/* Steps */}
         <div className="relative">
           {/* Connecting Line */}
-          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-linear-to-r from-blue-200 via-purple-200 to-green-200 transform -translate-y-1/2" />
+          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-linear-to-r from-purple-500/30 via-blue-500/30 to-cyan-500/30 transform -translate-y-1/2" />
 
           {/* Steps Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
@@ -71,22 +71,22 @@ const HowItWorks = () => {
                 className="relative"
               >
                 {/* Step Card */}
-                <div className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition transform hover:scale-105 relative z-10">
+                <div className="bg-gray-800/60 backdrop-blur-xl border border-purple-500/20 rounded-2xl p-6 shadow-2xl hover:shadow-purple-500/20 transition transform hover:scale-105 relative z-10">
                   {/* Step Number */}
-                  <div className="absolute -top-4 -left-4 w-10 h-10 bg-linear-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                  <div className="absolute -top-4 -left-4 w-12 h-12 bg-linear-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-purple-500/25">
                     {index + 1}
                   </div>
 
                   {/* Icon */}
-                  <div className={`inline-flex p-4 rounded-xl bg-linear-to-br ${step.color} mb-4`}>
+                  <div className={`inline-flex p-4 rounded-xl bg-linear-to-br ${step.color} mb-6 shadow-lg`}>
                     <step.icon className="h-8 w-8 text-white" />
                   </div>
 
                   {/* Content */}
-                  <h3 className="text-xl font-bold text-gray-800 mb-3">
+                  <h3 className="text-xl font-bold text-white mb-3">
                     {step.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-gray-300 leading-relaxed">
                     {step.description}
                   </p>
                 </div>
@@ -112,7 +112,7 @@ const HowItWorks = () => {
         >
           <a
             href="/dashboard"
-            className="inline-flex items-center space-x-2 px-8 py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-2xl transition transform hover:scale-105"
+            className="inline-flex items-center space-x-2 px-8 py-4 bg-linear-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:shadow-2xl hover:shadow-purple-500/25 transition transform hover:scale-105"
           >
             <span>Try It Now</span>
             <ArrowRight className="h-5 w-5" />
