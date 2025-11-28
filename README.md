@@ -70,7 +70,7 @@ graph TD
     E --> F[💾 Data Storage]
     F --> G[📈 Statistics Update]
     G --> H[📋 History Management]
-    
+     
     style A fill:#e1f5fe,color:#000
     style C fill:#f3e5f5,color:#000
     style D fill:#fff3e0,color:#000
