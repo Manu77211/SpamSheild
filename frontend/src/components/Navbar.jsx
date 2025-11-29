@@ -97,7 +97,7 @@ const Navbar = () => {
                 <Link
                   to="/signup"
                   className="px-5 py-2.5 bg-linear-to-r from-purple-500 to-blue-500 text-white rounded-xl hover:from-purple-600 hover:to-blue-600 transition-all duration-300 font-medium shadow-lg hover:shadow-purple-500/25 transform hover:scale-105">
-                  Get Started
+                  Signup
                 </Link>
               </>
             )}
