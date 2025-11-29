@@ -183,10 +183,10 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/signup"
-                  className="block px-5 py-3 bg-linear-to-r from-purple-500 to-blue-500 text-white rounded-xl hover:from-purple-600 hover:to-blue-600 transition-all duration-300 font-medium shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 text-center">
-                  onClick={() => setIsOpen(false)}
+                  className="block px-5 py-3 bg-linear-to-r from-purple-500 to-blue-500 text-white rounded-xl hover:from-purple-600 hover:to-blue-600 transition-all duration-300 font-medium shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 text-center"
+                  onClick={() => setIsOpen(false)}>
                 
-                  Get Started
+                  signup
                 </Link>
               </>
             )}
