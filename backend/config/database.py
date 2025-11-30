@@ -1,54 +1,31 @@
-from pymongo import MongoClient
-from config.settings import Config
+# Database placeholder - Using local storage instead of MongoDB
+# No database connection needed for SpamShield
+
 import logging
 
 logger = logging.getLogger(__name__)
 
 class Database:
-    _instance = None
-    _client = None
-    _db = None
+    """Simple placeholder for database functionality"""
     
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(Database, cls).__new__(cls)
-            cls._instance._initialize()
-        return cls._instance
-    
-    def _initialize(self):
-        """Initialize MongoDB connection"""
-        try:
-            self._client = MongoClient(Config.MONGODB_URI)
-            self._db = self._client[Config.DATABASE_NAME]
-            
-            # Test connection
-            self._client.admin.command('ping')
-            logger.info("Successfully connected to MongoDB")
-            
-        except Exception as e:
-            logger.error(f"Failed to connect to MongoDB: {e}")
-            # Don't raise the error - let the app start without DB
-            logger.warning("App starting without MongoDB connection")
-            self._client = None
-            self._db = None
+    def __init__(self):
+        logger.info("SpamShield using local storage - no database required")
     
     @property
     def client(self):
-        return self._client
+        return None
     
     @property
     def db(self):
-        return self._db
+        return None
     
     def get_collection(self, name):
-        """Get a specific collection"""
-        return self._db[name]
+        """Placeholder method"""
+        return None
     
     def close_connection(self):
-        """Close database connection"""
-        if self._client:
-            self._client.close()
-            logger.info("Database connection closed")
+        """Placeholder method"""
+        pass
 
-# Global database instance
+# Initialize database placeholder
 db = Database()

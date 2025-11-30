@@ -135,21 +135,8 @@ def create_app(config_name=None):
         logger.info(f"Environment: {config_name}")
         logger.info(f"Debug mode: {app.config['DEBUG']}")
         
-        # Create database indexes for better performance
-        try:
-            # Index on user_id for messages
-            db.get_collection('messages').create_index('user_id')
-            db.get_collection('messages').create_index([('user_id', 1), ('analyzed_at', -1)])
-            
-            # Index on user_id for statistics
-            db.get_collection('statistics').create_index('user_id')
-            
-            # Index on clerk_user_id for users
-            db.get_collection('users').create_index('clerk_user_id', unique=True)
-            
-            logger.info("Database indexes created successfully")
-        except Exception as e:
-            logger.error(f"Error creating database indexes: {e}")
+        # Database setup - using local JSON files, no indexes needed
+        logger.info("Using local JSON file storage - no database indexes required")
     
     # Call startup function
     with app.app_context():

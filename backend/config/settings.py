@@ -8,13 +8,8 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key')
     DEBUG = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'
     
-    # MongoDB Configuration
-    MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb://localhost:27017/')
-    DATABASE_NAME = os.getenv('DATABASE_NAME', 'spamshield')
-    
-    # Clerk Authentication
-    CLERK_PUBLISHABLE_KEY = os.getenv('CLERK_PUBLISHABLE_KEY')
-    CLERK_SECRET_KEY = os.getenv('CLERK_SECRET_KEY')
+    # Google AI Configuration
+    GOOGLE_AI_API_KEY = os.getenv('GOOGLE_AI_API_KEY')
     
     # Security
     JWT_SECRET = os.getenv('JWT_SECRET', 'jwt-secret-key')
@@ -28,7 +23,12 @@ class Config:
     ALLOWED_EXTENSIONS = set(os.getenv('ALLOWED_EXTENSIONS', 'txt,csv').split(','))
     
     # CORS
-    CORS_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    CORS_ORIGINS = [
+        "http://localhost:5173", 
+        "http://localhost:5174",
+        "http://127.0.0.1:5173",
+        "https://spam-sheild.vercel.app"
+    ]
 
 class DevelopmentConfig(Config):
     DEBUG = True

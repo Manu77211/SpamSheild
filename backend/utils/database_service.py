@@ -1,49 +1,97 @@
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
-from bson import ObjectId
-from config.database import db
-from models.models import User, Message, Statistics
+import json
+import os
 import logging
 
 logger = logging.getLogger(__name__)
 
 class DatabaseService:
-    """Database operations service"""
+    """Local storage database service - no MongoDB required"""
     
     def __init__(self):
-        self.users_collection = db.get_collection('users')
-        self.messages_collection = db.get_collection('messages')
-        self.statistics_collection = db.get_collection('statistics')
+        # Create data directory if it doesn't exist
+        self.data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+        os.makedirs(self.data_dir, exist_ok=True)
+        
+        # Define file paths
+        self.users_file = os.path.join(self.data_dir, 'users.json')
+        self.messages_file = os.path.join(self.data_dir, 'messages.json')
+        self.statistics_file = os.path.join(self.data_dir, 'statistics.json')
+        
+        # Initialize files if they don't exist
+        self._init_files()
+    
+    def _init_files(self):
+        """Initialize JSON files if they don't exist"""
+        for file_path in [self.users_file, self.messages_file, self.statistics_file]:
+            if not os.path.exists(file_path):
+                with open(file_path, 'w') as f:
+                    json.dump([], f)
+    
+    def _load_data(self, file_path: str) -> List[Dict]:
+        """Load data from JSON file"""
+        try:
+            with open(file_path, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            logger.error(f"Error loading data from {file_path}: {e}")
+            return []
+    
+    def _save_data(self, file_path: str, data: List[Dict]) -> bool:
+        """Save data to JSON file"""
+        try:
+            with open(file_path, 'w') as f:
+                json.dump(data, f, indent=2, default=str)
+            return True
+        except Exception as e:
+            logger.error(f"Error saving data to {file_path}: {e}")
+            return False
     
     # User Operations
     def create_or_get_user(self, clerk_user_id: str, email: str = None) -> Dict[str, Any]:
-        """Create or retrieve user"""
+        """Create or retrieve user (using local storage)"""
         try:
-            user = self.users_collection.find_one({'clerk_user_id': clerk_user_id})
+            # Load existing users
+            users = self._load_data(self.users_file)
             
-            if user:
-                return User.from_dict(user).to_dict()
+            # Find existing user
+            for user in users:
+                if user.get('clerk_user_id') == clerk_user_id:
+                    return user
             
             # Create new user
-            new_user = User(clerk_user_id=clerk_user_id, email=email)
-            result = self.users_collection.insert_one(new_user.to_dict())
+            new_user = {
+                'id': len(users) + 1,
+                'clerk_user_id': clerk_user_id,
+                'email': email,
+                'created_at': datetime.utcnow().isoformat(),
+                'updated_at': datetime.utcnow().isoformat()
+            }
             
-            new_user._id = result.inserted_id
-            return new_user.to_dict()
+            users.append(new_user)
+            self._save_data(self.users_file, users)
+            
+            return new_user
             
         except Exception as e:
             logger.error(f"Error creating/getting user: {e}")
             raise
     
     def update_user(self, clerk_user_id: str, update_data: Dict[str, Any]) -> bool:
-        """Update user information"""
+        """Update user information (using local storage)"""
         try:
-            update_data['updated_at'] = datetime.utcnow()
-            result = self.users_collection.update_one(
-                {'clerk_user_id': clerk_user_id},
-                {'$set': update_data}
-            )
-            return result.modified_count > 0
+            users = self._load_data(self.users_file)
+            
+            for i, user in enumerate(users):
+                if user.get('clerk_user_id') == clerk_user_id:
+                    user.update(update_data)
+                    user['updated_at'] = datetime.utcnow().isoformat()
+                    users[i] = user
+                    self._save_data(self.users_file, users)
+                    return True
+            
+            return False
         except Exception as e:
             logger.error(f"Error updating user: {e}")
             return False
@@ -51,27 +99,34 @@ class DatabaseService:
     # Message Operations
     def save_message_analysis(self, user_id: str, content: str, analysis_result: Dict[str, Any], 
                             ip_address: str = None, user_agent: str = None) -> Dict[str, Any]:
-        """Save message analysis to database"""
+        """Save message analysis to local JSON file"""
         try:
-            message = Message(
-                user_id=user_id,
-                content=content,
-                risk_score=analysis_result.get('risk_score', 0),
-                classification=analysis_result.get('classification', 'unknown'),
-                confidence=analysis_result.get('confidence', 0.0),
-                threats_detected=analysis_result.get('threats_detected', []),
-                analysis_details=analysis_result.get('analysis_details', {}),
-                ip_address=ip_address,
-                user_agent=user_agent
-            )
+            # Load existing messages
+            messages = self._load_data(self.messages_file)
             
-            result = self.messages_collection.insert_one(message.to_dict())
-            message._id = result.inserted_id
+            # Create new message object
+            message = {
+                'id': len(messages) + 1,
+                'user_id': user_id,
+                'content': content,
+                'risk_score': analysis_result.get('risk_score', 0),
+                'classification': analysis_result.get('classification', 'unknown'),
+                'confidence': analysis_result.get('confidence', 0.0),
+                'threats_detected': analysis_result.get('threats_detected', []),
+                'analysis_details': analysis_result.get('analysis_details', {}),
+                'ip_address': ip_address,
+                'user_agent': user_agent,
+                'analyzed_at': datetime.now().isoformat()
+            }
             
-            # Update user statistics
-            self.update_user_statistics(user_id, analysis_result.get('classification'))
+            # Add to messages list
+            messages.append(message)
             
-            return message.to_dict()
+            # Save back to file
+            self._save_data(self.messages_file, messages)
+            
+            logger.info(f"Message analysis saved successfully for user {user_id}")
+            return message
             
         except Exception as e:
             logger.error(f"Error saving message analysis: {e}")
@@ -79,33 +134,44 @@ class DatabaseService:
     
     def get_user_messages(self, user_id: str, limit: int = 50, skip: int = 0, 
                          classification: str = None) -> List[Dict[str, Any]]:
-        """Get user's message history"""
+        """Get user's message history from local JSON file"""
         try:
-            query = {'user_id': user_id}
+            messages = self._load_data(self.messages_file)
+            
+            # Filter by user_id
+            user_messages = [msg for msg in messages if msg.get('user_id') == user_id]
+            
+            # Filter by classification if specified
             if classification:
-                query['classification'] = classification
+                user_messages = [msg for msg in user_messages if msg.get('classification') == classification]
             
-            cursor = self.messages_collection.find(query).sort('analyzed_at', -1).skip(skip).limit(limit)
-            messages = []
+            # Sort by analyzed_at descending
+            user_messages.sort(key=lambda x: x.get('analyzed_at', ''), reverse=True)
             
-            for doc in cursor:
-                message = Message.from_dict(doc)
-                messages.append(message.to_dict())
-            
-            return messages
+            # Apply pagination
+            start_idx = skip
+            end_idx = skip + limit
+            return user_messages[start_idx:end_idx]
             
         except Exception as e:
             logger.error(f"Error getting user messages: {e}")
             return []
     
     def delete_message(self, user_id: str, message_id: str) -> bool:
-        """Delete a specific message"""
+        """Delete a specific message from local JSON file"""
         try:
-            result = self.messages_collection.delete_one({
-                '_id': ObjectId(message_id),
-                'user_id': user_id
-            })
-            return result.deleted_count > 0
+            messages = self._load_data(self.messages_file)
+            
+            # Find and remove the message
+            original_count = len(messages)
+            messages = [msg for msg in messages if not (msg.get('id') == int(message_id) and msg.get('user_id') == user_id)]
+            
+            # Save updated data
+            if len(messages) < original_count:
+                self._save_data(self.messages_file, messages)
+                return True
+            
+            return False
         except Exception as e:
             logger.error(f"Error deleting message: {e}")
             return False
@@ -125,84 +191,101 @@ class DatabaseService:
     def update_user_statistics(self, user_id: str, classification: str):
         """Update user statistics after message analysis"""
         try:
-            stats = self.statistics_collection.find_one({'user_id': user_id})
+            stats_data = self._load_data(self.statistics_file)
             
-            if not stats:
+            # Find existing stats for user
+            user_stats = None
+            stats_index = -1
+            for i, stats in enumerate(stats_data):
+                if stats.get('user_id') == user_id:
+                    user_stats = stats
+                    stats_index = i
+                    break
+            
+            if not user_stats:
                 # Create new statistics record
-                stats = Statistics(user_id=user_id).to_dict()
+                user_stats = {
+                    'user_id': user_id,
+                    'total_messages': 0,
+                    'spam_count': 0,
+                    'safe_count': 0,
+                    'suspicious_count': 0,
+                    'created_at': datetime.utcnow().isoformat(),
+                    'updated_at': datetime.utcnow().isoformat()
+                }
             
             # Update totals
-            stats['total_messages'] = stats.get('total_messages', 0) + 1
+            user_stats['total_messages'] = user_stats.get('total_messages', 0) + 1
             
             if classification == 'spam':
-                stats['spam_count'] = stats.get('spam_count', 0) + 1
+                user_stats['spam_count'] = user_stats.get('spam_count', 0) + 1
             elif classification == 'safe':
-                stats['safe_count'] = stats.get('safe_count', 0) + 1
+                user_stats['safe_count'] = user_stats.get('safe_count', 0) + 1
             elif classification == 'suspicious':
-                stats['suspicious_count'] = stats.get('suspicious_count', 0) + 1
+                user_stats['suspicious_count'] = user_stats.get('suspicious_count', 0) + 1
             
-            # Update daily stats
-            today = datetime.utcnow().date().isoformat()
-            daily_stats = stats.get('daily_stats', {})
-            if today not in daily_stats:
-                daily_stats[today] = {'total': 0, 'spam': 0, 'safe': 0, 'suspicious': 0}
+            user_stats['updated_at'] = datetime.utcnow().isoformat()
             
-            daily_stats[today]['total'] += 1
-            daily_stats[today][classification] = daily_stats[today].get(classification, 0) + 1
-            stats['daily_stats'] = daily_stats
+            # Save or update stats
+            if stats_index >= 0:
+                stats_data[stats_index] = user_stats
+            else:
+                stats_data.append(user_stats)
             
-            # Update monthly stats
-            month = datetime.utcnow().strftime('%Y-%m')
-            monthly_stats = stats.get('monthly_stats', {})
-            if month not in monthly_stats:
-                monthly_stats[month] = {'total': 0, 'spam': 0, 'safe': 0, 'suspicious': 0}
-            
-            monthly_stats[month]['total'] += 1
-            monthly_stats[month][classification] = monthly_stats[month].get(classification, 0) + 1
-            stats['monthly_stats'] = monthly_stats
-            
-            stats['last_updated'] = datetime.utcnow()
-            
-            # Upsert statistics
-            self.statistics_collection.update_one(
-                {'user_id': user_id},
-                {'$set': stats},
-                upsert=True
-            )
+            self._save_data(self.statistics_file, stats_data)
             
         except Exception as e:
             logger.error(f"Error updating user statistics: {e}")
     
     def get_user_statistics(self, user_id: str) -> Dict[str, Any]:
-        """Get user statistics"""
+        """Get user statistics from local JSON file"""
         try:
-            stats = self.statistics_collection.find_one({'user_id': user_id})
-            if stats:
-                return Statistics.from_dict(stats).to_dict()
+            stats_data = self._load_data(self.statistics_file)
+            
+            # Find user stats
+            for stats in stats_data:
+                if stats.get('user_id') == user_id:
+                    return stats
             
             # Return empty statistics if none exist
-            return Statistics(user_id=user_id).to_dict()
+            return {
+                'user_id': user_id,
+                'total_messages': 0,
+                'spam_count': 0,
+                'safe_count': 0,
+                'suspicious_count': 0,
+                'created_at': datetime.utcnow().isoformat(),
+                'updated_at': datetime.utcnow().isoformat()
+            }
             
         except Exception as e:
             logger.error(f"Error getting user statistics: {e}")
-            return Statistics(user_id=user_id).to_dict()
+            return {
+                'user_id': user_id,
+                'total_messages': 0,
+                'spam_count': 0,
+                'safe_count': 0,
+                'suspicious_count': 0
+            }
     
     def get_recent_activity(self, user_id: str, days: int = 30) -> List[Dict[str, Any]]:
-        """Get recent activity for dashboard"""
+        """Get recent activity for dashboard from local JSON file"""
         try:
+            messages = self._load_data(self.messages_file)
             since_date = datetime.utcnow() - timedelta(days=days)
+            since_date_str = since_date.isoformat()
             
-            cursor = self.messages_collection.find({
-                'user_id': user_id,
-                'analyzed_at': {'$gte': since_date}
-            }).sort('analyzed_at', -1).limit(10)
+            # Filter by user and date
+            user_messages = [
+                msg for msg in messages 
+                if msg.get('user_id') == user_id and 
+                msg.get('analyzed_at', '') >= since_date_str
+            ]
             
-            activities = []
-            for doc in cursor:
-                message = Message.from_dict(doc)
-                activities.append(message.to_dict())
+            # Sort by analyzed_at descending and limit to 10
+            user_messages.sort(key=lambda x: x.get('analyzed_at', ''), reverse=True)
             
-            return activities
+            return user_messages[:10]
             
         except Exception as e:
             logger.error(f"Error getting recent activity: {e}")
