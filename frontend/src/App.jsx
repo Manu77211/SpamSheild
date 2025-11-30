@@ -7,6 +7,7 @@ import Statistics from './pages/Statistics';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import About from './pages/About';
+import AuthCallback from './pages/AuthCallback';
 import Chatbot from './components/Chatbot';
 import ToastProvider from './components/ToastProvider';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -41,6 +42,7 @@ function App() {
           } />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
         </Routes>
           <Chatbot />
         </div>
