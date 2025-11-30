@@ -114,18 +114,11 @@ def create_app(config_name=None):
     # Health check endpoint
     @app.route('/health')
     def health():
-        try:
-            # Test database connection
-            db.client.admin.command('ping')
-            db_status = 'connected'
-        except Exception as e:
-            logger.error(f"Database health check failed: {e}")
-            db_status = 'disconnected'
-        
+        # Using local JSON storage - no database connection to test
         return jsonify({
             'status': 'healthy',
             'timestamp': datetime.utcnow().isoformat(),
-            'database': db_status,
+            'storage': 'local_json_files',
             'environment': config_name
         })
     
