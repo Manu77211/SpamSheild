@@ -1,7 +1,7 @@
 // API Service for SpamShield Backend
-// Handles all communication with Flask backend at localhost:5000
+// Handles all communication with Flask backend on Render
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'https://spamsheild-1.onrender.com';
 
 class SpamShieldAPI {
   constructor() {

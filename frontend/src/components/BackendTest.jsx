@@ -143,7 +143,7 @@ const BackendTest = () => {
             ) : (
               <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                 <div className="text-red-800 font-semibold">❌ Backend Connection Failed</div>
-                <div className="text-red-700 text-sm">Make sure Flask backend is running on http://localhost:5000</div>
+                <div className="text-red-700 text-sm">Backend: https://spamsheild-1.onrender.com</div>
               </div>
             )}
           </motion.div>
