@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 import Home from './pages/Home';
 import News from './pages/News';
 import Dashboard from './pages/Dashboard';
@@ -14,9 +15,10 @@ import SpamTestSuite from './components/SpamTestSuite';
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen">
-        <ToastProvider />
+    <AuthProvider>
+      <Router>
+        <div className="min-h-screen">
+          <ToastProvider />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/news" element={<News />} />
@@ -40,9 +42,10 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
         </Routes>
-        <Chatbot />
-      </div>
-    </Router>
+          <Chatbot />
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

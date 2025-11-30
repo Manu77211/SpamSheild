@@ -1,12 +1,18 @@
 import { useState } from 'react';
-import { Shield, Menu, X, User, LogOut } from 'lucide-react';
+import { Shield, Menu, X, User, LogOut, ChevronDown } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth, UserButton } from '@clerk/clerk-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation();
-  const { isSignedIn } = useAuth();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    setDropdownOpen(false);
+  };
 
   return (
     <nav className="fixed w-full bg-gray-900/90 backdrop-blur-xl z-50 shadow-2xl border-b border-purple-500/20">
@@ -77,15 +83,33 @@ const Navbar = () => {
                 location.pathname === '/statistics' ? 'w-full' : 'group-hover:w-full'
               }`}></span>
             </Link>
-            {isSignedIn ? (
-              <UserButton 
-                appearance={{
-                  elements: {
-                    avatarBox: "w-9 h-9 border-2 border-purple-400 shadow-lg shadow-purple-500/25"
-                  }
-                }}
-                afterSignOutUrl="/"
-              />
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center gap-2 p-2 rounded-xl hover:bg-purple-500/10 text-gray-300 hover:text-purple-400 transition-all duration-300 backdrop-blur-sm border border-purple-500/20"
+                >
+                  <div className="w-8 h-8 rounded-full bg-linear-to-r from-purple-400 to-blue-400 flex items-center justify-center">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+                
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-xl shadow-xl border border-purple-500/20 py-2">
+                    <div className="px-4 py-2 border-b border-gray-700">
+                      <p className="text-sm text-gray-300 truncate">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-left text-gray-300 hover:bg-purple-500/10 hover:text-purple-400 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <Link
@@ -161,16 +185,19 @@ const Navbar = () => {
             >
               Statistics
             </Link>
-            {isSignedIn ? (
-              <div className="flex justify-center pt-4">
-                <UserButton 
-                  appearance={{
-                    elements: {
-                      avatarBox: "w-11 h-11 border-2 border-purple-400 shadow-lg shadow-purple-500/25"
-                    }
-                  }}
-                  afterSignOutUrl="/"
-                />
+            {user ? (
+              <div className="pt-4 border-t border-gray-700">
+                <div className="flex items-center justify-center gap-2 px-4 py-2 text-gray-300">
+                  <User className="w-5 h-5" />
+                  <span className="text-sm truncate">{user.email}</span>
+                </div>
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 text-gray-300 hover:bg-purple-500/10 hover:text-purple-400 transition-colors rounded-lg mx-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
               </div>
             ) : (
               <>

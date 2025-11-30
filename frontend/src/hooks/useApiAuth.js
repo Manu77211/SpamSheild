@@ -1,27 +1,29 @@
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth } from '../contexts/AuthContext';
 import { useEffect } from 'react';
 import apiService from '../services/api';
+import { supabase } from '../lib/supabase';
 
-// Hook to set up API authentication with Clerk
+// Hook to set up API authentication with Supabase
 export const useApiAuth = () => {
-  const { getToken, isLoaded, isSignedIn } = useAuth();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (isLoaded) {
+    if (!loading) {
       // Set up the token getter function for the API service
       apiService.setAuthTokenGetter(async () => {
-        if (isSignedIn) {
+        if (user) {
           try {
-            return await getToken();
+            const { data: { session } } = await supabase.auth.getSession();
+            return session?.access_token || null;
           } catch (error) {
-            console.error('Failed to get Clerk token:', error);
+            console.error('Failed to get Supabase token:', error);
             return null;
           }
         }
         return null;
       });
     }
-  }, [getToken, isLoaded, isSignedIn]);
+  }, [user, loading]);
 
-  return { isLoaded, isSignedIn };
+  return { isLoaded: !loading, isSignedIn: !!user };
 };

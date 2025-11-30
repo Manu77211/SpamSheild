@@ -14,7 +14,7 @@ class SpamShieldAPI {
     this.getToken = tokenGetter;
   }
 
-  // Get auth headers with Clerk token
+  // Get auth headers with Supabase token
   async getAuthHeaders() {
     const headers = {
       'Content-Type': 'application/json',
