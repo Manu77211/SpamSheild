@@ -8,24 +8,38 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        // Handle hash-based OAuth callbacks
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        
+        if (accessToken) {
+          // If we have an access token in the hash, let Supabase handle it
+          const { data, error } = await supabase.auth.getSession();
+          if (data.session) {
+            navigate('/dashboard', { replace: true });
+            return;
+          }
+        }
+
+        // Handle regular callback
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Auth callback error:', error);
-          navigate('/login');
+          navigate('/login', { replace: true });
           return;
         }
 
         if (data.session) {
           // User is authenticated, redirect to dashboard
-          navigate('/dashboard');
+          navigate('/dashboard', { replace: true });
         } else {
           // No session, redirect to login
-          navigate('/login');
+          navigate('/login', { replace: true });
         }
       } catch (error) {
         console.error('Auth callback error:', error);
-        navigate('/login');
+        navigate('/login', { replace: true });
       }
     };
 
