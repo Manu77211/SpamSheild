@@ -172,17 +172,14 @@ const Chatbot = forwardRef((props, ref) => {
             onClick={() => setIsOpen(false)}
           />
           <div
-            className="fixed inset-4 sm:bottom-6 sm:right-6 sm:left-auto sm:top-auto w-full sm:w-auto max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl h-full sm:h-auto min-h-[400px] sm:min-h-[400px] max-h-full sm:max-h-[80vh] bg-gray-900/95 backdrop-blur-xl border border-purple-500/30 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300 z-50"
+            className="fixed bottom-6 right-6 w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl h-auto min-h-[400px] max-h-[70vh] sm:max-h-[80vh] bg-gray-900/95 backdrop-blur-xl border border-purple-500/30 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300 z-50 mx-6 sm:mx-0"
             style={{
               position: 'fixed',
-              top: window.innerWidth < 640 ? '16px' : 'auto',
-              bottom: window.innerWidth < 640 ? '16px' : '24px',
-              left: window.innerWidth < 640 ? '16px' : 'auto',
-              right: window.innerWidth < 640 ? '16px' : '24px',
-              width: window.innerWidth < 640 ? 'calc(100vw - 32px)' : 'auto',
-              height: window.innerWidth < 640 ? 'calc(100vh - 32px)' : 'auto',
+              bottom: '24px',
+              right: '24px',
+              width: 'auto',
               minHeight: '400px',
-              maxHeight: window.innerWidth < 640 ? 'calc(100vh - 32px)' : '80vh',
+              maxHeight: window.innerWidth < 640 ? '60vh' : '80vh',
               backgroundColor: '#fff',
               borderRadius: '16px',
               boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)',
@@ -213,7 +210,7 @@ const Chatbot = forwardRef((props, ref) => {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50 min-h-[300px] max-h-[60vh]">
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50 min-h-0 sm:min-h-[300px] max-h-[60vh]">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
@@ -281,7 +278,7 @@ const Chatbot = forwardRef((props, ref) => {
           </div>
 
           {/* Input */}
-          <div className="p-4 border-t border-purple-500/20 bg-gray-800/60">
+          <div className="p-3 sm:p-4 border-t border-purple-500/20 bg-gray-800/60">
             <div className="flex space-x-2">
               <input
                 type="text"
