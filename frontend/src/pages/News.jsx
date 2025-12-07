@@ -18,6 +18,7 @@ const News = () => {
       category: 'phishing',
       date: '2025-11-27',
       image: 'https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?w=800&auto=format&fit=crop',
+      url: 'https://www.kaspersky.com/blog/phishing-attacks-banking/12345/',
       trending: true,
     },
     {
@@ -27,6 +28,7 @@ const News = () => {
       category: 'scams',
       date: '2025-11-26',
       image: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&auto=format&fit=crop',
+      url: 'https://www.fbi.gov/scams-and-safety/common-scams-and-crimes/cryptocurrency-scams',
       trending: true,
     },
     {
@@ -36,6 +38,7 @@ const News = () => {
       category: 'updates',
       date: '2025-11-25',
       image: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&auto=format&fit=crop',
+      url: 'https://www.spamshield.com/blog/ai-detection-update',
       trending: false,
     },
     {
@@ -45,6 +48,7 @@ const News = () => {
       category: 'malware',
       date: '2025-11-24',
       image: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=800&auto=format&fit=crop',
+      url: 'https://www.malwarebytes.com/blog/news/2023/12/fake-delivery-texts-malware',
       trending: false,
     },
     {
@@ -54,6 +58,7 @@ const News = () => {
       category: 'phishing',
       date: '2025-11-23',
       image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop',
+      url: 'https://www.csoonline.com/article/571231/ai-powered-social-engineering-attacks.html',
       trending: true,
     },
     {
@@ -63,6 +68,7 @@ const News = () => {
       category: 'scams',
       date: '2025-11-22',
       image: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=800&auto=format&fit=crop',
+      url: 'https://www.consumer.ftc.gov/articles/holiday-scams',
       trending: false,
     },
   ];
@@ -145,13 +151,19 @@ const News = () => {
               .filter((article) => article.trending)
               .slice(0, 2)
               .map((article, index) => (
-                <motion.div
+                <a
                   key={article.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="bg-gray-800/60 backdrop-blur-xl border border-purple-500/20 rounded-2xl shadow-2xl shadow-purple-500/10 overflow-hidden hover:shadow-purple-500/20 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
                 >
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    className="bg-gray-800/60 backdrop-blur-xl border border-purple-500/20 rounded-2xl shadow-2xl shadow-purple-500/10 overflow-hidden hover:shadow-purple-500/20 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                  >
                   <div className="relative h-48">
                     <img
                       src={article.image}
@@ -178,6 +190,7 @@ const News = () => {
                     <p className="text-gray-300">{article.excerpt}</p>
                   </div>
                 </motion.div>
+                </a>
               ))}
           </div>
         </div>
@@ -187,14 +200,20 @@ const News = () => {
           <h2 className="text-2xl font-bold text-white mb-6">All Articles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredArticles.map((article, index) => (
-              <motion.div
+              <a
                 key={article.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.05 }}
-                className="bg-gray-800/60 backdrop-blur-xl border border-purple-500/20 rounded-xl shadow-2xl shadow-purple-500/10 overflow-hidden hover:shadow-purple-500/20 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                href={article.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
               >
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: index * 0.05 }}
+                  className="bg-gray-800/60 backdrop-blur-xl border border-purple-500/20 rounded-xl shadow-2xl shadow-purple-500/10 overflow-hidden hover:shadow-purple-500/20 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                >
                 <div className="relative h-40">
                   <img
                     src={article.image}
@@ -217,12 +236,13 @@ const News = () => {
                       <span>{new Date(article.date).toLocaleDateString()}</span>
                     </div>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">
+                  <h3 className="text-lg font-bold text-white mb-2 line-clamp-2">
                     {article.title}
                   </h3>
-                  <p className="text-sm text-gray-600 line-clamp-3">{article.excerpt}</p>
+                  <p className="text-sm text-white line-clamp-3">{article.excerpt}</p>
                 </div>
               </motion.div>
+              </a>
             ))}
           </div>
         </div>
