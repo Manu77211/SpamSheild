@@ -165,24 +165,34 @@ const Chatbot = forwardRef((props, ref) => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div 
-          className="fixed bottom-6 right-6 w-80 sm:w-96 min-h-[400px] max-h-[80vh] bg-gray-900/95 backdrop-blur-xl border border-purple-500/30 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300 z-50"
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            width: '384px',
-            minHeight: '400px',
-            maxHeight: '80vh',
-            backgroundColor: '#fff',
-            borderRadius: '16px',
-            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)',
-            zIndex: 9999,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden'
-          }}
-        >
+        <>
+          {/* Backdrop for click-outside-to-close */}
+          <div
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={() => setIsOpen(false)}
+          />
+          <div
+            className="fixed inset-4 sm:bottom-6 sm:right-6 sm:left-auto sm:top-auto w-full sm:w-auto max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl h-full sm:h-auto min-h-[400px] sm:min-h-[400px] max-h-full sm:max-h-[80vh] bg-gray-900/95 backdrop-blur-xl border border-purple-500/30 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300 z-50"
+            style={{
+              position: 'fixed',
+              top: window.innerWidth < 640 ? '16px' : 'auto',
+              bottom: window.innerWidth < 640 ? '16px' : '24px',
+              left: window.innerWidth < 640 ? '16px' : 'auto',
+              right: window.innerWidth < 640 ? '16px' : '24px',
+              width: window.innerWidth < 640 ? 'calc(100vw - 32px)' : 'auto',
+              height: window.innerWidth < 640 ? 'calc(100vh - 32px)' : 'auto',
+              minHeight: '400px',
+              maxHeight: window.innerWidth < 640 ? 'calc(100vh - 32px)' : '80vh',
+              backgroundColor: '#fff',
+              borderRadius: '16px',
+              boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)',
+              zIndex: 9999,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden'
+            }}
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+          >
           {/* Header */}
           <div className="flex justify-between items-center p-4 bg-linear-to-r from-blue-600 to-purple-600 text-white">
             <div className="flex items-center space-x-2">
@@ -291,6 +301,7 @@ const Chatbot = forwardRef((props, ref) => {
             </div>
           </div>
         </div>
+        </>
       )}
 
       {/* Floating particles effect */}
