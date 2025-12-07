@@ -154,9 +154,7 @@ const SpamTestSuite = () => {
             threats: analysis.threats_detected,
             isCorrect,
             reasons: [
-              ...analysis.analysis_details.keyword_matches.map(k => `Keyword: "${k}"`),
-              ...analysis.analysis_details.pattern_matches.map(p => `Pattern: ${p}`),
-              ...analysis.analysis_details.url_matches.map(u => `URL: ${u.domain}`),
+              ...analysis.analysis_details.model_explanations.map(exp => `ML: ${exp}`),
               ...(analysis.threats_detected.length > 0 ? [`Threats: ${analysis.threats_detected.join(', ')}`] : [])
             ]
           }

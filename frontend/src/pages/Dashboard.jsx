@@ -108,10 +108,7 @@ const Dashboard = () => {
           isSpam: analysisData.classification === 'spam',
           confidence: Math.round(analysisData.confidence * 100),
           reasons: [
-            ...analysisData.analysis_details.keyword_matches.map(k => `Contains spam keyword: "${k}"`),
-            ...analysisData.analysis_details.pattern_matches.map(p => `Suspicious pattern: ${p}`),
-            ...analysisData.analysis_details.url_matches.map(u => `Suspicious URL: ${u.domain}`),
-            ...analysisData.analysis_details.formatting_issues.map(f => `Formatting issue: ${f}`),
+            ...analysisData.analysis_details.model_explanations.map(exp => `ML Analysis: ${exp}`),
             ...(analysisData.threats_detected.length > 0 ? [`Threat detected: ${analysisData.threats_detected.join(', ')}`] : [])
           ],
           threatType: analysisData.threats_detected.join(', ') || 'None',
@@ -195,10 +192,7 @@ const Dashboard = () => {
           isSpam: analysisData.classification === 'spam',
           confidence: Math.round(analysisData.confidence * 100), // Convert 0.9 to 90
           reasons: [
-            ...analysisData.analysis_details.keyword_matches.map(k => `Contains spam keyword: "${k}"`),
-            ...analysisData.analysis_details.pattern_matches.map(p => `Suspicious pattern: ${p}`),
-            ...analysisData.analysis_details.url_matches.map(u => `Suspicious URL: ${u.domain}`),
-            ...analysisData.analysis_details.formatting_issues.map(f => `Formatting issue: ${f}`),
+            ...analysisData.analysis_details.model_explanations.map(exp => `ML Analysis: ${exp}`),
             ...(analysisData.threats_detected.length > 0 ? [`Threat detected: ${analysisData.threats_detected.join(', ')}`] : [])
           ],
           threatType: analysisData.threats_detected.join(', ') || 'None',

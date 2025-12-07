@@ -8,3 +8,6 @@ flask-limiter==3.5.0
 reportlab==4.0.8
 fpdf2==2.7.6
 gunicorn==21.2.0
+transformers>=4.21.0
+torch>=1.12.0
+accelerate>=0.20.0

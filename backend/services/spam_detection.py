@@ -6,236 +6,266 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Try to import ML libraries safely
+try:
+    from transformers import pipeline
+    ML_AVAILABLE = True
+except ImportError:
+    logger.error("ML libraries not available - ML model required")
+    ML_AVAILABLE = False
+
 class SpamDetector:
-    """Advanced spam detection engine"""
-    
+    """ML-powered spam detection engine"""
+
     def __init__(self):
-        self.spam_keywords = [
-            # Financial scams
-            'free money', 'cash prize', 'urgent payment', 'wire transfer', 'bank account',
-            'inheritance', 'lottery', 'winner', 'congratulations', 'claim now',
-            'limited time', 'act now', 'urgent', 'immediate', 'verify account',
-            
-            # Phishing
-            'click here', 'update payment', 'confirm identity', 'suspended account',
-            'verify now', 'login verification', 'security alert', 'account locked',
-            'unusual activity', 'confirm details',
-            
-            # Romance/Social scams
-            'lonely', 'love you', 'destiny', 'soulmate', 'marry me', 'divorce',
-            'widow', 'orphan', 'military', 'overseas', 'deployment',
-            
-            # General spam
-            'make money', 'work from home', 'get rich', 'no experience',
-            'guaranteed income', 'passive income', 'investment opportunity',
-            'risk free', 'double your money'
-        ]
-        
-        self.suspicious_patterns = [
-            r'\b\d{4}-\d{4}-\d{4}-\d{4}\b',  # Credit card numbers
-            r'\b\d{3}-\d{2}-\d{4}\b',        # SSN pattern
-            r'[A-Z]{2,}\s+[A-Z]{2,}',        # All caps words
-            r'!!!+',                          # Multiple exclamation marks
-            r'\$\d+',                         # Money amounts
-            r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',  # URLs
-        ]
-        
-        self.phishing_domains = [
-            'bit.ly', 'tinyurl.com', 'goo.gl', 't.co', 'short.link',
-            'suspicious-bank.com', 'fake-paypal.net', 'scam-site.org'
-        ]
-        
-        self.threat_categories = {
-            'financial_scam': ['money', 'payment', 'bank', 'account', 'transfer', 'prize'],
-            'phishing': ['verify', 'login', 'account', 'suspended', 'security', 'click'],
-            'romance_scam': ['love', 'lonely', 'marry', 'destiny', 'military'],
-            'job_scam': ['work from home', 'make money', 'no experience', 'guaranteed'],
-            'tech_support': ['computer', 'virus', 'infected', 'microsoft', 'support'],
-            'charity_scam': ['donation', 'charity', 'help', 'disaster', 'urgent help']
-        }
+        if not ML_AVAILABLE:
+            raise ImportError("ML libraries required for spam detection")
+
+        # Load ML model
+        self.classifier = None
+        try:
+            self.classifier = pipeline("text-classification", model="dima806/email-spam-detection-roberta")
+            logger.info("ML model loaded successfully")
+        except Exception as e:
+            logger.error(f"Failed to load ML model: {e}")
+            raise e
     
     def analyze_message(self, message: str, user_id: str = None) -> Dict[str, Any]:
         """
-        Analyze a message for spam indicators
-        
+        Analyze a message using ML model only
+
         Returns:
             Dict containing analysis results
         """
         try:
             message_lower = message.lower().strip()
-            
+
             if not message_lower:
                 return self._create_result(0, 'safe', 0.0, [], {})
-            
-            # Initialize scores
-            keyword_score = 0
-            pattern_score = 0
-            url_score = 0
-            formatting_score = 0
-            
-            # Analyze keywords
-            keyword_matches = []
-            for keyword in self.spam_keywords:
-                if keyword.lower() in message_lower:
-                    keyword_matches.append(keyword)
-                    keyword_score += 15
-            
-            # Analyze suspicious patterns
-            pattern_matches = []
-            for pattern in self.suspicious_patterns:
-                matches = re.findall(pattern, message, re.IGNORECASE)
-                if matches:
-                    pattern_matches.extend(matches)
-                    pattern_score += 20
-            
-            # Analyze URLs
-            url_matches = []
-            urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', message)
-            for url in urls:
-                url_matches.append(url)
-                domain = self._extract_domain(url)
-                if domain in self.phishing_domains:
-                    url_score += 30
-                else:
-                    url_score += 10
-            
-            # Analyze message formatting
-            formatting_issues = []
-            
-            # Check for excessive caps
-            caps_ratio = sum(1 for c in message if c.isupper()) / len(message) if message else 0
-            if caps_ratio > 0.6:
-                formatting_score += 20
-                formatting_issues.append('excessive_caps')
-            
-            # Check for excessive punctuation
-            exclamation_count = message.count('!')
-            question_count = message.count('?')
-            if exclamation_count > 3:
-                formatting_score += 15
-                formatting_issues.append('excessive_exclamation')
-            if question_count > 2:
-                formatting_score += 10
-                formatting_issues.append('excessive_questions')
-            
-            # Check message length (very short or very long can be suspicious)
-            if len(message) < 10:
-                formatting_score += 5
-                formatting_issues.append('too_short')
-            elif len(message) > 1000:
-                formatting_score += 10
-                formatting_issues.append('too_long')
-            
-            # Calculate total risk score
-            total_score = min(100, keyword_score + pattern_score + url_score + formatting_score)
-            
-            # Determine classification and confidence (93-98% range, stable based on message content)
-            base_confidence = 0.93  # 93% minimum
-            confidence_range = 0.05  # 5% range (93-98%)
-            # Use message content hash for stable confidence (same message = same confidence)
-            content_hash = abs(hash(message)) % 500
-            stable_randomness = content_hash / 10000  # Creates 0.0000 to 0.0499
-            high_confidence = min(0.98, base_confidence + stable_randomness)
-            
-            if total_score >= 70:
-                classification = 'spam'
-                confidence = round(high_confidence, 3)  # 3 decimal places
-            elif total_score >= 40:
-                classification = 'suspicious'
-                confidence = round(high_confidence - 0.01, 3)  # Slightly lower for suspicious
+
+            # Use ML model for prediction
+            if self.classifier:
+                try:
+                    result = self.classifier(message)
+                    score = result[0]['score']
+                    label = result[0]['label']
+
+                    # Improved scoring with real ML confidence
+                    if label == 'Spam':
+                        if score > 0.8:
+                            classification = 'spam'
+                            risk_score = min(100, max(70, int(score * 100)))  # 80-100 range
+                        elif score > 0.6:
+                            classification = 'suspicious'
+                            risk_score = min(69, max(50, int(score * 100)))  # 60-69 range
+                        else:
+                            classification = 'suspicious'
+                            risk_score = min(49, max(30, int(score * 100)))  # 30-49 range
+                        confidence = round(score, 3)  # Real ML confidence for spam
+                    else:  # 'No spam'
+                        if score > 0.9:
+                            classification = 'safe'
+                            risk_score = max(0, int((1-score) * 10))  # 0-1 range for very confident safe
+                        elif score > 0.7:
+                            classification = 'safe'
+                            risk_score = max(0, int((1-score) * 20))  # 0-6 range for confident safe
+                        else:
+                            classification = 'suspicious'
+                            risk_score = min(29, max(10, int((1-score) * 50)))  # 10-29 range for uncertain
+                        confidence = round(score, 3)  # Real ML confidence for safe
+
+                    # Analyze content for specific characteristics (for explanations only)
+                    content_analysis = self._analyze_content_characteristics(message_lower)
+
+                    # Generate intelligent explanations based on ML + content analysis
+                    explanations = self._generate_smart_explanations(classification, score, label, content_analysis)
+
+                    analysis_details = {
+                        'ml_label': label,
+                        'ml_score': score,
+                        'model_explanations': explanations
+                    }
+
+                    return self._create_result(risk_score, classification, confidence, content_analysis, analysis_details)
+
+                except Exception as e:
+                    logger.error(f"ML prediction failed: {e}")
+                    return self._create_result(0, 'error', 0.0, [], {'error': f'ML prediction failed: {str(e)}'})
+
             else:
-                classification = 'safe'
-                confidence = round(high_confidence, 3)
-            
-            # Identify threat categories
-            threats_detected = self._identify_threats(message_lower)
-            
-            # Create detailed analysis
-            analysis_details = {
-                'keyword_matches': keyword_matches,
-                'pattern_matches': pattern_matches,
-                'url_matches': url_matches,
-                'formatting_issues': formatting_issues,
-                'message_length': len(message),
-                'caps_ratio': caps_ratio,
-                'exclamation_count': exclamation_count,
-                'question_count': question_count,
-                'scores': {
-                    'keyword_score': keyword_score,
-                    'pattern_score': pattern_score,
-                    'url_score': url_score,
-                    'formatting_score': formatting_score
-                }
-            }
-            
-            return self._create_result(
-                total_score, 
-                classification, 
-                confidence, 
-                threats_detected, 
-                analysis_details
-            )
-            
+                logger.error("ML model not available")
+                return self._create_result(0, 'error', 0.0, [], {'error': 'ML model not available'})
+
         except Exception as e:
             logger.error(f"Error analyzing message: {e}")
             return self._create_result(0, 'error', 0.0, [], {'error': str(e)})
     
-    def _identify_threats(self, message: str) -> List[str]:
-        """Identify specific threat categories"""
-        threats = []
-        for category, keywords in self.threat_categories.items():
-            for keyword in keywords:
-                if keyword in message:
-                    threats.append(category)
-                    break
-        return threats
-    
-    def _extract_domain(self, url: str) -> str:
-        """Extract domain from URL"""
-        try:
-            parsed = urllib.parse.urlparse(url)
-            return parsed.netloc.lower()
-        except:
-            return ''
-    
     def _create_result(self, risk_score: int, classification: str, confidence: float, 
-                      threats: List[str], details: Dict[str, Any]) -> Dict[str, Any]:
+                      content_analysis: Dict[str, List[str]], details: Dict[str, Any]) -> Dict[str, Any]:
         """Create standardized analysis result"""
         return {
             'risk_score': risk_score,
             'classification': classification,
             'confidence': confidence,
-            'threats_detected': threats,
+            'threats_detected': [],  # No longer used, kept for compatibility
             'analysis_details': details,
-            'recommendations': self._get_recommendations(classification, threats),
+            'recommendations': self._get_recommendations(classification, content_analysis),
             'analyzed_at': datetime.utcnow().isoformat()
         }
-    
-    def _get_recommendations(self, classification: str, threats: List[str]) -> List[str]:
+
+    def _get_recommendations(self, classification: str, content_analysis: Dict[str, List[str]]) -> List[str]:
         """Get security recommendations based on analysis"""
         recommendations = []
-        
+
         if classification == 'spam':
             recommendations.append("🚨 This message appears to be spam. Do not respond or click any links.")
             recommendations.append("🗑️ Delete this message immediately.")
-            
+
         elif classification == 'suspicious':
             recommendations.append("⚠️ This message contains suspicious elements. Exercise caution.")
             recommendations.append("🔍 Verify the sender's identity before taking any action.")
-            
-        if 'financial_scam' in threats:
-            recommendations.append("💰 Never share financial information via text/email.")
-            
-        if 'phishing' in threats:
-            recommendations.append("🎣 This appears to be a phishing attempt. Don't click links or provide credentials.")
-            
-        if 'romance_scam' in threats:
-            recommendations.append("💔 Be cautious of romantic advances from unknown contacts.")
-        
-        if not recommendations:
+
+        else:
             recommendations.append("✅ This message appears to be safe, but always stay vigilant.")
-            
+
         return recommendations
+
+    def _analyze_content_characteristics(self, message: str) -> Dict[str, List[str]]:
+        """Analyze message content for specific characteristics (for explanations only)"""
+        characteristics = {
+            'money': [],
+            'urgency': [],
+            'phishing': [],
+            'social': [],
+            'technical': []
+        }
+
+        # Money-related indicators
+        money_keywords = ['free', 'prize', 'won', 'cash', 'money', 'dollar', 'bitcoin', 'crypto', 'investment', 'lottery']
+        for keyword in money_keywords:
+            if keyword in message:
+                characteristics['money'].append(keyword)
+
+        # Urgency indicators
+        urgency_keywords = ['urgent', 'immediate', 'now', 'act fast', 'limited time', 'expires', 'deadline', 'rush']
+        for keyword in urgency_keywords:
+            if keyword in message:
+                characteristics['urgency'].append(keyword)
+
+        # Phishing indicators
+        phishing_keywords = ['click here', 'verify', 'confirm', 'login', 'account', 'password', 'suspended', 'security alert']
+        for keyword in phishing_keywords:
+            if keyword in message:
+                characteristics['phishing'].append(keyword)
+
+        # Check for URLs
+        urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', message)
+        if urls:
+            characteristics['phishing'].extend(['contains_links'] * len(urls))
+
+        # Social engineering indicators
+        social_keywords = ['lonely', 'love', 'destiny', 'soulmate', 'marry', 'military', 'overseas', 'widow', 'orphan']
+        for keyword in social_keywords:
+            if keyword in message:
+                characteristics['social'].append(keyword)
+
+        # Technical support scams
+        technical_keywords = ['virus', 'infected', 'microsoft', 'support', 'computer', 'error', 'fix', 'repair']
+        for keyword in technical_keywords:
+            if keyword in message:
+                characteristics['technical'].append(keyword)
+
+        return characteristics
+
+    def _generate_smart_explanations(self, classification: str, score: float, label: str,
+                                   content_analysis: Dict[str, List[str]]) -> List[str]:
+        """Generate intelligent explanations based on ML results and content analysis"""
+        explanations = []
+
+        # Base ML explanation
+        if classification == 'spam':
+            explanations.append(f"🤖 AI model detected this as spam with {score:.1%} confidence")
+        elif classification == 'suspicious':
+            if label == 'Spam':
+                explanations.append(f"🤖 AI model flagged as potentially spam ({score:.1%} confidence)")
+            else:
+                explanations.append(f"🤖 AI model classified as safe but with moderate confidence ({score:.1%})")
+        else:
+            explanations.append(f"🤖 AI model classified as safe with {score:.1%} confidence")
+
+        # Content-specific explanations
+        if content_analysis['money']:
+            money_terms = ', '.join(content_analysis['money'][:3])  # Limit to 3 terms
+            explanations.append(f"💰 Contains money-related terms: {money_terms}")
+
+        if content_analysis['urgency']:
+            urgency_terms = ', '.join(content_analysis['urgency'][:2])
+            explanations.append(f"⏰ Creates false urgency with: {urgency_terms}")
+
+        if content_analysis['phishing']:
+            phishing_indicators = []
+            if 'contains_links' in content_analysis['phishing']:
+                phishing_indicators.append('suspicious links')
+            phishing_terms = [term for term in content_analysis['phishing'] if term != 'contains_links'][:2]
+            phishing_indicators.extend(phishing_terms)
+            explanations.append(f"🎣 Phishing indicators: {', '.join(phishing_indicators)}")
+
+        if content_analysis['social']:
+            social_terms = ', '.join(content_analysis['social'][:2])
+            explanations.append(f"💕 Social engineering tactics: {social_terms}")
+
+        if content_analysis['technical']:
+            technical_terms = ', '.join(content_analysis['technical'][:2])
+            explanations.append(f"🛠️ Technical support scam indicators: {technical_terms}")
+
+        # Add general explanations if no specific characteristics found
+        if not any(content_analysis.values()):
+            if classification == 'spam':
+                explanations.append("📧 Message exhibits typical spam patterns")
+            elif classification == 'suspicious':
+                explanations.append("🤔 Message contains some unusual elements")
+            else:
+                explanations.append("✅ No suspicious characteristics detected")
+
+        return explanations[:5]  # Limit to 5 explanations
+
+    def _get_recommendations(self, classification: str, content_analysis: Dict[str, List[str]]) -> List[str]:
+        """Get tailored security recommendations based on content analysis"""
+        recommendations = []
+
+        if classification == 'spam':
+            recommendations.append("🚨 This message appears to be spam. Do not respond or click any links.")
+            recommendations.append("🗑️ Delete this message immediately.")
+
+            # Content-specific recommendations
+            if content_analysis['money']:
+                recommendations.append("💰 Never share financial information or send money to unknown contacts.")
+            if content_analysis['phishing']:
+                recommendations.append("🎣 This appears to be a phishing attempt. Don't click links or provide credentials.")
+            if content_analysis['urgency']:
+                recommendations.append("⏰ Scammers create false urgency - take time to verify before acting.")
+            if content_analysis['social']:
+                recommendations.append("💕 Be cautious of romantic advances or personal stories from unknown contacts.")
+            if content_analysis['technical']:
+                recommendations.append("🛠️ Never give remote access to your computer or pay for unsolicited tech support.")
+
+        elif classification == 'suspicious':
+            recommendations.append("⚠️ This message contains suspicious elements. Exercise caution.")
+            recommendations.append("🔍 Verify the sender's identity before taking any action.")
+
+            if content_analysis['phishing']:
+                recommendations.append("🎣 Check URLs carefully and avoid clicking suspicious links.")
+            if content_analysis['money']:
+                recommendations.append("💰 Be extremely cautious with any financial requests.")
+
+        else:  # safe
+            recommendations.append("✅ This message appears to be safe, but always stay vigilant.")
+
+            if content_analysis['phishing'] or content_analysis['money']:
+                recommendations.append("🔒 Even in safe messages, never share sensitive information.")
+
+        # Limit to 4 recommendations max
+        return recommendations[:4]
 
 # Global spam detector instance
 spam_detector = SpamDetector()

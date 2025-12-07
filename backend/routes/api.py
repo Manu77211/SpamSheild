@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify, g
 from utils.auth import require_auth, get_current_user_id
 from utils.database_service import database_service
-from services.spam_detection import spam_detector
 from werkzeug.utils import secure_filename
 import logging
 import os
@@ -11,13 +10,23 @@ logger = logging.getLogger(__name__)
 # Create blueprint
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
+# Lazy-loaded spam detector
+_spam_detector = None
+
+def get_spam_detector():
+    global _spam_detector
+    if _spam_detector is None:
+        from services.spam_detection import spam_detector
+        _spam_detector = spam_detector
+    return _spam_detector
+
 @api_bp.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
     return jsonify({
         'status': 'healthy',
         'message': 'SpamShield API is running',
-        'timestamp': spam_detector._create_result(0, 'safe', 1.0, [], {})['analyzed_at']
+        'timestamp': get_spam_detector()._create_result(0, 'safe', 1.0, [], {})['analyzed_at']
     })
 
 @api_bp.route('/analyze', methods=['POST'])
@@ -48,7 +57,7 @@ def analyze_message():
             }), 400
         
         # Analyze the message
-        analysis_result = spam_detector.analyze_message(content, user_id)
+        analysis_result = get_spam_detector().analyze_message(content, user_id)
         
         # Save to database
         ip_address = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR'))
@@ -125,7 +134,7 @@ def analyze_file():
             
             for i, line in enumerate(lines[:50]):  # Limit to 50 lines
                 if line.strip():
-                    analysis = spam_detector.analyze_message(line.strip(), user_id)
+                    analysis = get_spam_detector().analyze_message(line.strip(), user_id)
                     results.append({
                         'line_number': i + 1,
                         'content': line.strip()[:100] + ('...' if len(line) > 100 else ''),
@@ -150,7 +159,7 @@ def analyze_file():
         
         else:
             # Analyze entire text file
-            analysis_result = spam_detector.analyze_message(content, user_id)
+            analysis_result = get_spam_detector().analyze_message(content, user_id)
             
             saved_message = database_service.save_message_analysis(
                 user_id=user_id,
