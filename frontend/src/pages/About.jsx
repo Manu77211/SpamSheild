@@ -2,6 +2,7 @@ import { Shield, Target, Heart, Users, Award, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import project from '../assets/project.jpeg';
 
 const About = () => {
   const values = [
@@ -121,7 +122,7 @@ const About = () => {
               className="relative"
             >
               <img
-                src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&auto=format&fit=crop"
+                src={project}
                 alt="Team collaboration"
                 className="rounded-2xl shadow-2xl"
               />
